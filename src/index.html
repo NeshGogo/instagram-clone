@@ -2,22 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
+    <link rel="stylesheet" href="./assets/styles/style.css" />
     <title>Instagram</title>
   </head>
   <body>
     <section class="auth">
-      <div class="auth__logo">
-          <img src="./assets/img/icon-instagram.svg" alt="Icono de instagram" />
+      <img class="auth__logo" src="./assets/img/logo.png" alt="Icono de instagram" />
 
-        <h1>Instagram</h1>
-      </div>
       <form>
         <input class="auth__input" type="email" placeholder="Correo Electronico" />
-        <input type="password" placeholder="Contraseña" />
+        <input class="auth__input" type="password" placeholder="Contraseña" />
         <button class="auth__btn" type="button">Login</button>
       </form>
+
+      <p class="auth__footer">¿No tienes una cuenta? <a href="#">Registrate</a></p>
     </section>
     <script src="ts/index.ts"></script>
   </body>
