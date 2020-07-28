@@ -1,0 +1,28 @@
+{
+  "name": "instagram-clone",
+  "version": "1.0.0",
+  "description": "It's a small web version of instagram",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel src/index.html src/*.html src/**/*.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeshGogo/instagram-clone.git"
+  },
+  "author": "neshgogo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NeshGogo/instagram-clone/issues"
+  },
+  "homepage": "https://github.com/NeshGogo/instagram-clone#readme",
+  "dependencies": {
+    "parcel-bundler": "^1.12.4"
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ],
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
+}
