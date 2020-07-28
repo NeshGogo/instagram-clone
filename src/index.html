@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Instagram</title>
-</head>
-<body>
-  <script src="ts/index.ts"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instagram</title>
+  </head>
+  <body>
+    <section class="auth">
+      <div class="auth__logo">
+          <img src="./assets/img/icon-instagram.svg" alt="Icono de instagram" />
+
+        <h1>Instagram</h1>
+      </div>
+      <form>
+        <input class="auth__input" type="email" placeholder="Correo Electronico" />
+        <input type="password" placeholder="Contraseña" />
+        <button class="auth__btn" type="button">Login</button>
+      </form>
+    </section>
+    <script src="ts/index.ts"></script>
+  </body>
 </html>
