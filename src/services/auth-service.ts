@@ -1,5 +1,6 @@
 import { User } from '../models/user';
 import { environment } from '../env/environment';
+const Swal = require('sweetalert');
 const Firebase = require('firebase/app');
 require('firebase/auth');
 require('firebase/firestore');
@@ -22,7 +23,6 @@ export class AuthService {
   }
   getCurrentUser(): any {
     this.currentUser = this.auth().currentUser;
-    console.log(this.currentUser);
     return this.currentUser;
   }
 
@@ -30,9 +30,11 @@ export class AuthService {
     try {
       await this.auth().createUserWithEmailAndPassword(user.email, password);
       await this.db().collection(this.USERS).doc(this.getCurrentUser().uid).set(user);
-      alert('se creo');
+      Swal('Registrado!', 'El usuario fue registrado exitosamente!!', 'success');
     } catch (error) {
-      console.log(error.message);
+      error.code === 'auth/email-already-in-use'
+        ? Swal('Oops', 'Este correo electronico esta en uso.', 'error')
+        : Swal('Lo sentimos ☹', 'Ocurrion un error al momento de registro. Vuelve a intentarlo.', 'error');
     }
   }
 
@@ -40,7 +42,7 @@ export class AuthService {
     this.auth()
       .signInWithEmailAndPassword(email, password)
       .catch((error: any) => {
-        console.log(error.message);
+        Swal('Oops!', 'El usuario o la contraseña son incorrectos.', 'error');
       });
     return true;
   }

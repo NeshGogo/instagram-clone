@@ -18,7 +18,8 @@
   "homepage": "https://github.com/NeshGogo/instagram-clone#readme",
   "dependencies": {
     "firebase": "^7.17.1",
-    "parcel-bundler": "^1.12.4"
+    "parcel-bundler": "^1.12.4",
+    "sweetalert": "^2.1.2"
   },
   "browserslist": [
     "last 1 Chrome version"
