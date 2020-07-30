@@ -1,63 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Instagram</title>
-  <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon">
-  <link rel="stylesheet" href="./assets/styles/style.css">
-  <link rel="stylesheet" href="./assets/styles/profile.css">
-  <link rel="stylesheet" href="../node_modules\flexboxgrid\css\flexboxgrid.min.css">
-</head>
-<body>
-  <header class="header">
-    <div class="header__hero">
-      <img src="./assets/img/logo.png" alt="Logo de instagram">
-    </div>
-    <div class="header__access">
-      <a class="header__access--home" href="./home.html"><img src="./assets/img/icon-home.svg" alt="icono de home"></a>
-      <div class="header__access__user">
-        <div class="header__access__user--image">
-          <img src="" alt="1">
-        </div>
-        <p>Nombre de usuario</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instagram</title>
+    <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
+    <link rel="stylesheet" href="./assets/styles/style.css" />
+    <link rel="stylesheet" href="./assets/styles/profile.css" />
+    <link rel="stylesheet" href="../node_modules\flexboxgrid\css\flexboxgrid.min.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__hero">
+        <img src="./assets/img/logo.png" alt="Logo de instagram" />
       </div>
-    </div>
-  </header>
-  <section class="info">
-    <img src="" alt="Imagen de perfil">
-    <div>
-      <div class="info__user-name">
-        <p>neshgogo</p>
-        <button type="button">Editar perfil</button>
-      </div>
-      <p class="info__posts">0 Publicaciones</p>
-      <h6 class="info__name">Rafael Aguero Baez</h6>
-      <p class="info__biography">Ing. De Sistemas de Computacion</p>
-    </div>
-  </section>
-  <section class="posts">
-    <div class="posts__header">
-      <h4>Publicaciones</h4>
-      <img src="./assets/img/icon-plus.svg">
-    </div>
-    <div class="row start-xs">
-      <div class="col-xs-4">
-        <div class=" post">
-          <img src="" alt="Image de una plicacion">
+      <div class="header__access">
+        <a class="header__access--home" href="./home.html"><img src="./assets/img/icon-home.svg" alt="icono de home" /></a>
+        <div class="header__access__user">
+          <div class="header__access__user--image">
+            <img id="userImage" src="" alt="1" />
+          </div>
+          <p>Nombre de usuario</p>
         </div>
       </div>
-      <div class="col-xs-4">
-        <div class="post">
-          <img src="" alt="Image de una plicacion">
+    </header>
+    <section class="info">
+      <img id="userImage" src="" alt="Imagen de perfil" />
+      <div>
+        <div class="info__user-name">
+          <p id="userName"></p>
+          <button id="btnEdit" type="button">Editar perfil</button>
+        </div>
+        <p class="info__posts">
+          <span id="postCount"></span>
+          Publicaciones
+        </p>
+        <h6 id="userFullname" class="info__name"></h6>
+        <p id="userBiography" class="info__biography"></p>
+      </div>
+    </section>
+    <section class="posts">
+      <div class="posts__header">
+        <h4>Publicaciones</h4>
+        <img src="./assets/img/icon-plus.svg" />
+      </div>
+      <div class="row start-xs">
+        <div class="col-xs-4">
+          <div class="post">
+            <img src="" alt="Image de una plicacion" />
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="post">
+            <img src="" alt="Image de una plicacion" />
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="post">
+            <img src="" alt="Image de una plicacion" />
+          </div>
         </div>
       </div>
-      <div class="col-xs-4">
-        <div class="post">
-          <img src="" alt="Image de una plicacion">
-        </div>
-      </div>
-    </div>
-  </section>
-</body>
+    </section>
+    <script src="./ts/profile.ts"></script>
+  </body>
 </html>

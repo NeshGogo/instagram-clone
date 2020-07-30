@@ -1,6 +1,5 @@
 import { User } from '../models/user';
-import { environment } from '../env/environment';
-const Firebase = require('firebase/app');
+import { FirebaseService } from './firebase-service';
 require('firebase/firestore');
 
 export class UserService {
@@ -9,8 +8,7 @@ export class UserService {
   private db: any;
 
   private constructor() {
-    Firebase.initializeApp(environment.firebaseConfig);
-    this.db = Firebase.firestore();
+    this.db = FirebaseService.getFirebase().firestore();
   }
 
   static getInstance(): UserService {
@@ -28,7 +26,7 @@ export class UserService {
     }
   }
 
-  async addUserOrUpdate(user: User, id:string){
+  async addOrUpdateUser(user: User, id:string){
     try {
       await this.db.collection(this.USERS).doc(id).set(user);
     } catch (error) {
