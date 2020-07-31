@@ -2,9 +2,10 @@
   "name": "instagram-clone",
   "version": "1.0.0",
   "description": "It's a small web version of instagram",
-  "main": "index.js",
+  "main": "./js/index.js",
   "scripts": {
-    "start": "parcel src/index.html src/*.html src/**/*.html"
+    "start": "live-server",
+    "build": "tsc --outdir js"
   },
   "repository": {
     "type": "git",
@@ -17,14 +18,9 @@
   },
   "homepage": "https://github.com/NeshGogo/instagram-clone#readme",
   "dependencies": {
-    "firebase": "^7.17.1",
     "flexboxgrid": "^6.3.1",
-    "parcel-bundler": "^1.12.4",
-    "sweetalert": "^2.1.2"
+    "live-server": "^1.2.1"
   },
-  "browserslist": [
-    "last 1 Chrome version"
-  ],
   "devDependencies": {
     "typescript": "^3.9.7"
   }

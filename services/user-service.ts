@@ -1,6 +1,6 @@
 import { User } from '../models/user';
 import { FirebaseService } from './firebase-service';
-require('firebase/firestore');
+
 
 export class UserService {
   private static instance: UserService = new UserService();

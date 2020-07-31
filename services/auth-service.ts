@@ -1,30 +1,29 @@
 import { User } from '../models/user';
 import { UserService } from './user-service';
-import { FirebaseService } from './firebase-service';
 const Swal = require('sweetalert');
-require('firebase/auth');
 
 export class AuthService {
   private static instance: AuthService = new AuthService();
-  private currentUser: any;
   private auth: any;
+  private currentUser: any;
   private userService: UserService;
 
   private constructor() {
-    this.auth = FirebaseService.getFirebase().auth();
     this.userService = UserService.getInstance();
   }
 
   static getInstance(): AuthService {
     return this.instance;
   }
-  getCurrentUser(): any {
+
+  getCurrentUser() {
     this.currentUser = this.auth.currentUser;
     return this.currentUser;
   }
 
   async addUser(user: User, password: string) {
     try {
+      debugger;
       await this.auth.createUserWithEmailAndPassword(user.email, password);
       this.userService.addOrUpdateUser(user, this.getCurrentUser().uid);
       Swal('Registrado!', 'El usuario fue registrado exitosamente!!', 'success');

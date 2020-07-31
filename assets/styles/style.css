@@ -41,7 +41,7 @@ body{
   border-radius: 50%;
   margin-right: 5px;
   text-align: center;
-
+  line-height: 67px;
 }
 
 .header__access__user--image img{
