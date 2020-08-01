@@ -47,7 +47,7 @@ const verifiedPassword = () => {
   }
 }
 
-addError = (error) => {
+const addError = (error) => {
   const verified = !errorsLog
       .some((er) => er.message === error.message && er.id === error.id);
     if (verified) errorsLog.push(error);

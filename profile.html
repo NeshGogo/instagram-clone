@@ -62,6 +62,31 @@
         </div>
       </div>
     </section>
+    <section id="open-edit" class="modal">
+      <div class="modal-content">
+        <span id="close-edit" class="modal-close">&times;</span>
+        <h3 class="modal-content--title">Editar Perfil</h3>
+        <form>
+          <div class="container__form__input">
+            <input id="inputUserName" class="form__input" type="text" placeholder="Nombre de Usuario" />
+            <span id="inputUserNameError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input id="inputFullName" class="form__input" type="text" placeholder="Nombre completo" />
+            <span id="inputFullNameError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input id="inputBiography" class="form__input" type="text" placeholder="Biografia" />
+            <span id="inputBiographyError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input type="file" name="" id="" accept="image/*" >
+            <span id="inputBiographyError" class="form__error"></span>
+          </div>
+          <button id="btnUpdateUser" class="form__btn" type="button">Actualizar</button>
+        </form>
+      </div>
+    </section>
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
