@@ -15,6 +15,7 @@ const btnEdit = document.querySelector('#btnEdit');
 const userFullname = document.querySelector('#userFullname');
 const postCount = document.querySelector('#postCount');
 const userBiography = document.querySelector('#userBiography');
+const btnAddPost = document.querySelector('#addPost');
 
 // HtmlElements del modal de edicion de perfil
 const inputUserName = document.querySelector('#inputUserName');
@@ -22,6 +23,11 @@ const inputFullName = document.querySelector('#inputFullName');
 const inputBiography = document.querySelector('#inputBiography');
 const inputUserImageFile = document.querySelector('#inputUserImageFile');
 const btnUpdateUser = document.querySelector('#btnUpdateUser');
+
+// HtmlElements del modal de agregar post
+const inputPostFile = document.querySelector('#inputPostFile');
+const inputPostDescription = document.querySelector('#inputPostDescription');
+const btnCreatePost = document.querySelector('#btnCreatePost');
 
 
 auth.onAuthStateChanged(async (userAccount) => {
@@ -98,3 +104,19 @@ btnUpdateUser.onclick = async () => {
   document.getElementById('close-edit').onclick();
 }
 
+btnAddPost.onclick = () => {
+  const openEdit = document.getElementById('open-addPost');
+  setTimeout(() => {
+    openEdit.style.opacity = '1';
+    openEdit.style.pointerEvents = 'auto';
+  }, 0);
+}
+document.getElementById('close-addPost').onclick = () => {
+  const openEdit = document.getElementById('open-addPost');
+  inputPostDescription.value =  '';
+  inputPostFile.files.lenght = 0;
+  setTimeout(() => {
+    openEdit.style.opacity = '0';
+    openEdit.style.pointerEvents = 'none';
+  }, 0);
+}

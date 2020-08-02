@@ -42,7 +42,9 @@
     <section class="posts">
       <div class="posts__header">
         <h4>Publicaciones</h4>
-        <img src="./assets/img/icon-plus.svg" />
+        <a id="addPost">
+          <img src="./assets/img/icon-plus.svg" />
+        </a>
       </div>
       <div class="row start-xs">
         <div class="col-xs-4">
@@ -81,9 +83,24 @@
           </div>
           <div class="container__form__input">
             <input type="file" name="" id="inputUserImageFile" accept="image/*" >
-            <span id="inputBiographyError" class="form__error"></span>
           </div>
           <button id="btnUpdateUser" class="form__btn" type="button">Actualizar</button>
+        </form>
+      </div>
+    </section>
+    <section id="open-addPost" class="modal">
+      <div class="modal-content">
+        <span id="close-addPost" class="modal-close">&times;</span>
+        <h3 class="modal-content--title">Agregar publicacion.</h3>
+        <form>
+          <div class="container__form__input">
+            <input type="file" name="" id="inputPostFile" accept="image/*" >
+          </div>
+          <div class="container__form__input">
+            <textarea  class="form__input" id="inputPostDescription" cols="30" rows="5" placeholder="Descripcion"></textarea>
+            <span id="inputPostDescriptionError" class="form__error"></span>
+          </div>
+          <button id="btnCreatePost" class="form__btn" type="button">Agregar</button>
         </form>
       </div>
     </section>
