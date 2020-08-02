@@ -1,11 +1,12 @@
-import { firestore, auth } from '../services/firebase.js';
+import { firestore, auth, storage } from '../services/firebase.js';
 import { User } from '../models/user.js';
 
 
 const USERS = 'users';
 let currentUserId = '';
 let userApp;
-//htmlElements
+
+// HtmlElements de la pagina principal
 const headerUserImage = document.querySelector('#headerUserImage');
 const headerUserFullname = document.querySelector('#headerUserFullname');
 const userImage = document.querySelector('#userImage');
@@ -14,10 +15,14 @@ const btnEdit = document.querySelector('#btnEdit');
 const userFullname = document.querySelector('#userFullname');
 const postCount = document.querySelector('#postCount');
 const userBiography = document.querySelector('#userBiography');
+
+// HtmlElements del modal de edicion de perfil
 const inputUserName = document.querySelector('#inputUserName');
 const inputFullName = document.querySelector('#inputFullName');
 const inputBiography = document.querySelector('#inputBiography');
+const inputUserImageFile = document.querySelector('#inputUserImageFile');
 const btnUpdateUser = document.querySelector('#btnUpdateUser');
+
 
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
@@ -30,8 +35,6 @@ auth.onAuthStateChanged(async (userAccount) => {
     window.location.href = './index.html';
   }
 });
-
-
 
 const init = (user) => {
   if (user.imageUrl !== '') {
@@ -51,8 +54,6 @@ const init = (user) => {
     user.biography
   );
 };
-
-
 
 btnEdit.onclick = () => {
   const openEdit = document.getElementById('open-edit');
@@ -77,7 +78,23 @@ btnUpdateUser.onclick = async () => {
   userApp.userName = inputUserName.value;
   userApp.fullName = inputFullName.value;
   userApp.biography = inputBiography.value;
-  await firestore.collection(USERS).doc(currentUserId).set({...userApp});
+  const file = inputUserImageFile.files[0];
+  if (file) {
+    const storageRef = storage.ref(`${currentUserId}/profile.${file.name.split('.')[1]}`)
+    storageRef.put(file);
+    if (userApp.imageUrl === ''){
+      storageRef.getDownloadURL().then(url => {
+        userApp.imageUrl = url;
+        firestore.collection(USERS).doc(currentUserId).set({ ...userApp }, {merge: true});
+      });
+    }else{
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+  }else{
+    await firestore.collection(USERS).doc(currentUserId).set({ ...userApp });
+  }
   document.getElementById('close-edit').onclick();
 }
 
