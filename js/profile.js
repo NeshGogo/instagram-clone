@@ -1,8 +1,10 @@
 import { firestore, auth, storage } from '../services/firebase.js';
 import { User } from '../models/user.js';
+import { Post } from '../models/post.js';
 
 
 const USERS = 'users';
+const POSTS = 'posts';
 let currentUserId = '';
 let userApp;
 
@@ -25,8 +27,6 @@ const inputUserImageFile = document.querySelector('#inputUserImageFile');
 const btnUpdateUser = document.querySelector('#btnUpdateUser');
 
 // HtmlElements del modal de agregar post
-const inputPostFile = document.querySelector('#inputPostFile');
-const inputPostDescription = document.querySelector('#inputPostDescription');
 const btnCreatePost = document.querySelector('#btnCreatePost');
 
 
@@ -42,6 +42,22 @@ auth.onAuthStateChanged(async (userAccount) => {
   }
 });
 
+firestore.collection(POSTS)
+.where('userRef','==', currentUserId)
+.onSnapshot( querySnapShot => {
+  const postList = document.querySelector('#post__list');
+  postList.innerHTML= '';
+  querySnapShot.forEach(postDoc => {
+    const post= postDoc.data();
+    postList.innerHTML += `
+    <div class="col-xs-4">
+          <div class="post">
+            <img src="${post.imageUrl}" alt="Image de una plicacion" />
+          </div>
+    </div>
+    `
+  })
+});
 const init = (user) => {
   if (user.imageUrl !== '') {
     headerUserImage.src = user.imageUrl;
@@ -88,17 +104,17 @@ btnUpdateUser.onclick = async () => {
   if (file) {
     const storageRef = storage.ref(`${currentUserId}/profile.${file.name.split('.')[1]}`)
     storageRef.put(file);
-    if (userApp.imageUrl === ''){
+    if (userApp.imageUrl === '') {
       storageRef.getDownloadURL().then(url => {
         userApp.imageUrl = url;
-        firestore.collection(USERS).doc(currentUserId).set({ ...userApp }, {merge: true});
+        firestore.collection(USERS).doc(currentUserId).set({ ...userApp }, { merge: true });
       });
-    }else{
+    } else {
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     }
-  }else{
+  } else {
     await firestore.collection(USERS).doc(currentUserId).set({ ...userApp });
   }
   document.getElementById('close-edit').onclick();
@@ -111,12 +127,28 @@ btnAddPost.onclick = () => {
     openEdit.style.pointerEvents = 'auto';
   }, 0);
 }
+
 document.getElementById('close-addPost').onclick = () => {
   const openEdit = document.getElementById('open-addPost');
-  inputPostDescription.value =  '';
-  inputPostFile.files.lenght = 0;
+  document.getElementById('formAddPost').reset();
   setTimeout(() => {
     openEdit.style.opacity = '0';
     openEdit.style.pointerEvents = 'none';
   }, 0);
 }
+
+btnCreatePost.onclick = () => {
+  const inputPostFile = document.querySelector('#inputPostFile');
+  const inputPostDescription = document.querySelector('#inputPostDescription');
+  const file = inputPostFile.files[0];
+  if (file) {
+    const storageRef = storage.ref(`${currentUserId}/posts/${Date.now()}-${file.name}`)
+    storageRef.put(file);
+    storageRef.getDownloadURL().then(url => {
+      const post = new Post(currentUserId, inputPostDescription.value, url);
+      firestore.collection(POSTS).doc(currentUserId).set({ ...post });
+    });
+  }
+}
+
+post__list

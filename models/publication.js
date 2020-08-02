@@ -2,9 +2,9 @@
 export class Publication {
   constructor(
     userRef,
-    decription='',
+    description ='',
   ) {
-    this.decription = description;
+    this.description = description;
     this.userRef = userRef;
   }
 }
