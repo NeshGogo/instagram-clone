@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instagram</title>
+    <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
+    <link rel="stylesheet" href="./assets/styles/style.css" />
+    <link rel="stylesheet" href="./assets/styles/profile.css" />
+    <link rel="stylesheet" href="../node_modules\flexboxgrid\css\flexboxgrid.min.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__hero">
+        <img src="./assets/img/logo.png" alt="Logo de instagram" />
+      </div>
+      <div class="header__access">
+        <a class="header__access--home" href="./home.html"><img src="./assets/img/icon-home.svg" alt="icono de home" /></a>
+        <div class="header__access__user">
+          <div class="header__access__user--image">
+            <img id="headerUserImage" src="./assets/img/user-account.png" alt="imagen del perfil del usuario" />
+          </div>
+          <p id="headerUserFullname"></p>
+        </div>
+      </div>
+    </header>
+    <section class="info">
+      <img id="userImage" src="./assets/img/user-account.png" alt="Imagen de perfil" />
+      <div>
+        <div class="info__user-name">
+          <p id="userName"></p>
+          <button id="btnEdit" type="button">Editar perfil</button>
+        </div>
+        <p class="info__posts">
+          <span id="postCount"></span>
+          Publicaciones
+        </p>
+        <h6 id="userFullname" class="info__name"></h6>
+        <p id="userBiography" class="info__biography"></p>
+      </div>
+    </section>
+    <section class="posts">
+      <div class="posts__header">
+        <h4>Publicaciones</h4>
+        <a id="addPost">
+          <img src="./assets/img/icon-plus.svg" />
+        </a>
+      </div>
+      <div class="row start-xs">
+        <div class="col-xs-4">
+          <div class="post">
+            <img src="" alt="Image de una plicacion" />
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="post">
+            <img src="" alt="Image de una plicacion" />
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="post">
+            <img src="" alt="Image de una plicacion" />
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="open-edit" class="modal">
+      <div class="modal-content">
+        <span id="close-edit" class="modal-close">&times;</span>
+        <h3 class="modal-content--title">Editar Perfil</h3>
+        <form>
+          <div class="container__form__input">
+            <input id="inputUserName" class="form__input" type="text" placeholder="Nombre de Usuario" />
+            <span id="inputUserNameError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input id="inputFullName" class="form__input" type="text" placeholder="Nombre completo" />
+            <span id="inputFullNameError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input id="inputBiography" class="form__input" type="text" placeholder="Biografia" />
+            <span id="inputBiographyError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input type="file" name="" id="inputUserImageFile" accept="image/*" >
+          </div>
+          <button id="btnUpdateUser" class="form__btn" type="button">Actualizar</button>
+        </form>
+      </div>
+    </section>
+    <section id="open-addPost" class="modal">
+      <div class="modal-content">
+        <span id="close-addPost" class="modal-close">&times;</span>
+        <h3 class="modal-content--title">Agregar publicacion.</h3>
+        <form>
+          <div class="container__form__input">
+            <input type="file" name="" id="inputPostFile" accept="image/*" >
+          </div>
+          <div class="container__form__input">
+            <textarea  class="form__input" id="inputPostDescription" cols="30" rows="5" placeholder="Descripcion"></textarea>
+            <span id="inputPostDescriptionError" class="form__error"></span>
+          </div>
+          <button id="btnCreatePost" class="form__btn" type="button">Agregar</button>
+        </form>
+      </div>
+    </section>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
+    <script type="module" src="./js/profile.js"></script>
+  </body>
+</html>

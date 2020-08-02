@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
-    <link rel="stylesheet" href="./assets/styles/style.css" />
+    <link rel="stylesheet" href="./assets/styles/style.css">
+    <link rel="stylesheet" href="./assets/styles/auth.css" />
     <title>Instagram</title>
   </head>
   <body>
@@ -25,6 +26,10 @@
 
       <p class="auth__footer">¿No tienes una cuenta? <a href="./register.html">Registrate.</a></p>
     </section>
-    <script src="ts/index.ts"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="module" src="./js/index.js"></script>
   </body>
 </html>

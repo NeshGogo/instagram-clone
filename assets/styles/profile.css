@@ -1,0 +1,86 @@
+.info{
+  display: flex;
+  align-items: center;
+  margin: 50px 20% 20px 20%;
+}
+.info img {
+  height: 180px;
+  width: 180px;
+  border-radius: 50%;
+  overflow: hidden;
+  line-height: 180px;
+  text-align: center;
+  background-color: maroon;
+  margin-right: 30px;
+}
+
+.info__user-name{
+  display: flex;
+  align-items: center;
+}
+
+.info__user-name p{
+  margin: 0;
+  margin-right: 30px;
+  color: grey;
+  font-weight: 700;
+  font-size: 35px;
+}
+.info__user-name button{
+  margin-top: 5px;
+  height: 30px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  background-color: whitesmoke;
+  color: rgb(105, 105, 105);
+  font-family: roboto;
+  outline: none;
+}
+.info__user-name button:active{
+  box-shadow: 0px 0px 6px  lightskyblue;
+}
+.info__posts{
+  color: grey;
+  font-size: 14px;
+  font-style: italic;
+}
+.info__name{
+  margin-top: 30px;
+  margin-bottom: 0;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 18px;
+  color: grey;
+}
+
+.info__biography{
+  color: grey;
+  margin-top: 8px;
+}
+
+.posts{
+  margin: 50px 20% 10px 20%;
+}
+.posts__header{
+  display: flex;
+  align-items: center;
+  margin-bottom: 3%;
+}
+.posts__header h4{
+  color: grey;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  margin-right: 10px;
+}
+
+.posts__header img{
+  width: 40px;
+}
+
+.post{
+  background-color: maroon;
+  width: 230px;
+  height: 230px;
+  border-radius: 5px;
+}
