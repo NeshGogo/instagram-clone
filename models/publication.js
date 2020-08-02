@@ -6,5 +6,6 @@ export class Publication {
   ) {
     this.description = description;
     this.userRef = userRef;
+    this.date = new Date();
   }
 }

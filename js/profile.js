@@ -43,21 +43,28 @@ auth.onAuthStateChanged(async (userAccount) => {
 });
 
 firestore.collection(POSTS)
-.where('userRef','==', currentUserId)
-.onSnapshot( querySnapShot => {
-  const postList = document.querySelector('#post__list');
-  postList.innerHTML= '';
-  querySnapShot.forEach(postDoc => {
-    const post= postDoc.data();
-    postList.innerHTML += `
-    <div class="col-xs-4">
-          <div class="post">
-            <img src="${post.imageUrl}" alt="Image de una plicacion" />
+  .orderBy('date','desc')
+  .onSnapshot(querySnapShot => {
+    const postList = document.querySelector('#post__list');
+    postList.innerHTML = '';
+    querySnapShot.forEach(postDoc => {
+      const post = postDoc.data();
+      if(post.userRef === currentUserId){
+        postList.innerHTML += `
+          <div class="col-xs">
+                <div class=" post box ">
+                  <a id="${postDoc.id}">
+                    <img src="${post.imageUrl}" alt="Image de una plicacion" />
+                  </a>
+                </div>
           </div>
-    </div>
-    `
-  })
-});
+        `;
+        setTimeout(() => {
+          document.getElementById(postDoc.id).onclick = () => showPost(postDoc.id);
+        }, 0);
+      }
+    })
+  });
 const init = (user) => {
   if (user.imageUrl !== '') {
     headerUserImage.src = user.imageUrl;
@@ -137,18 +144,24 @@ document.getElementById('close-addPost').onclick = () => {
   }, 0);
 }
 
-btnCreatePost.onclick = () => {
+btnCreatePost.onclick = async () => {
   const inputPostFile = document.querySelector('#inputPostFile');
   const inputPostDescription = document.querySelector('#inputPostDescription');
   const file = inputPostFile.files[0];
   if (file) {
-    const storageRef = storage.ref(`${currentUserId}/posts/${Date.now()}-${file.name}`)
-    storageRef.put(file);
-    storageRef.getDownloadURL().then(url => {
+    try {
+      const storageRef = storage.ref(`${currentUserId}/posts/${Date.now()}-${file.name}`)
+      await storageRef.put(file);
+      let url = await storageRef.getDownloadURL();
       const post = new Post(currentUserId, inputPostDescription.value, url);
-      firestore.collection(POSTS).doc(currentUserId).set({ ...post });
-    });
+      await firestore.collection(POSTS).add({ ...post });
+    } catch (error) {
+      console.log(error);
+    }
   }
+  document.getElementById('close-addPost').onclick();
 }
 
-post__list
+const showPost = (id) => {
+  console.log(id);
+}

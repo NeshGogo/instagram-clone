@@ -1,4 +1,4 @@
-import { Publication } from "./publication";
+import { Publication } from "./publication.js";
 
 export class Comment extends Publication{
   constructor(userRef,description) {
