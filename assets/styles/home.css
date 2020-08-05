@@ -6,7 +6,116 @@
   height: 100%;
 }
 .header__access--home svg{
-  fill: rgb(59, 180, 255);
   height: 40px;
   width: 40px;
+}
+.header__access--home svg path{
+  fill: black;
+}
+.main {
+  margin-top: 95px;
+}
+.post-list{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.post-card{
+  width: 35%;
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+  margin-bottom: 50px;
+}
+
+.post-card--header{
+  display: flex;
+  align-items: center;
+  color: grey;
+  font-weight: bold;
+  font-style: italic;
+  border-bottom: 1px solid lightgrey;
+}
+
+.post-card--header img{
+  width: 40px;
+  height: 40px;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+.post-card--img{
+  width: 100%;
+  border-bottom: 1px solid lightgrey;
+}
+.post-card--footer-img {
+  padding-left: 10px;
+}
+.post-card--footer-img a > img{
+  width: 30px;
+  margin-right: 10px;
+}
+.post-card--footer-img > p{
+  margin-top: 2px;
+  font-style: italic;
+  font-size: 14px;
+  color: goldenrod;
+}
+.post-card--description{
+  margin-left: 10px;
+}
+
+.post-card--description h4{
+  margin-bottom: 0;
+  color: grey;
+  font-weight: bold;
+}
+.post-card--description p{
+  margin-top: 10px;
+  font-weight: 300;
+}
+.post-card--description strong{
+  color: grey;
+  font-weight: 500;
+}
+
+.post-card--comments{
+  margin-left: 10px;
+}
+.post-card--comments h4{
+  margin-bottom: 0;
+  color: grey;
+  font-weight: bold;
+}
+.post-card--comments a{
+  text-decoration: none;
+  font-style: italic;
+  font-weight: lighter;
+  font-size: 12px;
+  color: black;
+}
+.post-card--comments a:hover{
+  text-decoration: underline;
+}
+.post-card--comments div > p{
+  margin-top: 10px;
+  font-weight: 300;
+}
+.post-card--comments div > p > strong{
+  color: grey;
+  font-weight: 500;
+}
+.post--card--add-comment{
+  margin:10px;
+  display: flex;
+  align-items: flex-end;
+  color: lightskyblue;;
+}
+.post--card--add-comment input{
+  border-bottom: 1px solid lightgrey;
+}
+.post--card--add-comment input::placeholder{
+  font-weight: lighter;
+}
+.post--card--add-comment a:hover{
+  text-decoration: underline;
+  cursor: pointer;
 }

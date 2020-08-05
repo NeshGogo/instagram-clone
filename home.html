@@ -15,11 +15,20 @@
     <div class="header__hero">
       <img src="./assets/img/logo.png" alt="Logo de instagram" />
     </div>
+    <div class="header__search">
+      <input class="form__input"  type="text"placeholder="¿Que deseas buscar?" id="">
+      <a>Buscar</a>
+    </div>
     <div class="header__access">
       <a class="header__access--home" href="./home.html">
-        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px">
           <path
-            d="M 12 2 A 1 1 0 0 0 11.289062 2.296875 L 1.203125 11.097656 A 0.5 0.5 0 0 0 1 11.5 A 0.5 0.5 0 0 0 1.5 12 L 4 12 L 4 20 C 4 20.552 4.448 21 5 21 L 9 21 C 9.552 21 10 20.552 10 20 L 10 14 L 14 14 L 14 20 C 14 20.552 14.448 21 15 21 L 19 21 C 19.552 21 20 20.552 20 20 L 20 12 L 22.5 12 A 0.5 0.5 0 0 0 23 11.5 A 0.5 0.5 0 0 0 22.796875 11.097656 L 12.716797 2.3027344 A 1 1 0 0 0 12.710938 2.296875 A 1 1 0 0 0 12 2 z" />
+            fill="none"
+            stroke="#000000"
+            stroke-miterlimit="10"
+            stroke-width="2"
+            d="M19,11v9h-5v-6h-4v6H5v-9H3.606L12,3.445L20.394,11H19z"
+          />
         </svg>
         <!-- <img src="./assets/img/icon-home.svg" alt="icono de home" /> -->
       </a>
@@ -37,24 +46,35 @@
       </div>
     </div>
   </header>
-  <main>
+  <main class="main">
     <section class="post-list">
       <div class="post-card">
         <div class="post-card--header">
-          <img src="" alt="nombre del usuario del post">
-          <p></p>
+          <img src="./assets/img/user-account.png" alt="nombre del usuario del post">
+          <p>neshgogo</p>
         </div>
-        <img class="post-card--img" src="" alt="Imagen del post">
+        <img class="post-card--img" src="./assets/img/user-account.png" alt="Imagen del post">
         <div class="post-card--footer-img">
-          <p>Likes</p>
+          <a><img src="./assets/img/icon-heart-red.png" alt=""></a>
+          <a><img src="./assets/img/icon-comment.png" alt=""></a>
+          <p>200 Me gusta</p>
         </div>
-        <div class="post-card---description">
-          <p></p>
+        <div class="post-card--description">
+          <h4>Descripcion</h4>
+          <p><strong>neshgogo</strong> Esta fue una grandiosa foto.</p>
         </div>
         <div class="post-card--comments">
+          <h4>Comentarios</h4>
           <a href="">Ver los <span></span> comentarios</a>
+          <div>
+            <p><strong>neshgogo</strong> tu eres muy duro loco.</p>
+          </div>
         </div>
-        <input type="text" name="" id="">
+        <div class="post--card--add-comment">
+          <input class="form__input" type="text" placeholder="Agrega un comentario..." name="" id="">
+          <a id="sentComment">Publicar</a>
+        </div>
+        
       </div>
     </section>
   </main>

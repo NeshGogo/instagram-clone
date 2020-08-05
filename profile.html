@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Instagram -</title>
+    <title>Instagram - Profile</title>
     <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
     <link rel="stylesheet" href="./assets/styles/style.css" />
     <link rel="stylesheet" href="./assets/styles/profile.css" />
@@ -14,9 +14,21 @@
       <div class="header__hero">
         <img src="./assets/img/logo.png" alt="Logo de instagram" />
       </div>
+      <div class="header__search">
+        <input class="form__input"  type="text"placeholder="Buscar.." id="">
+        <a>Buscar</a>
+      </div>
       <div class="header__access">
         <a class="header__access--home" href="./home.html">
-          <img src="./assets/img/icon-home.svg" alt="icono de home" />
+          <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
+            <path
+              fill="none"
+              stroke="#000000"
+              stroke-miterlimit="10"
+              stroke-width="2"
+              d="M19,11v9h-5v-6h-4v6H5v-9H3.606L12,3.445L20.394,11H19z"
+            />
+          </svg>
         </a>
         <div class="header__access__user">
           <div>
@@ -53,16 +65,23 @@
       <div class="posts__header">
         <h4>Publicaciones</h4>
         <a id="addPost">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50pt" height="50pt" viewBox="0 0 50 50" version="1.1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            width="50pt"
+            height="50pt"
+            viewBox="0 0 50 50"
+            version="1.1"
+          >
             <g id="surface5227659">
-            <path d="M 25 2 C 12.308594 2 2 12.308594 2 25 C 2 37.691406 12.308594 48 25 48 C 37.691406 48 48 37.691406 48 25 C 48 12.308594 37.691406 2 25 2 Z M 25 4 C 36.609375 4 46 13.390625 46 25 C 46 36.609375 36.609375 46 25 46 C 13.390625 46 4 36.609375 4 25 C 4 13.390625 13.390625 4 25 4 Z M 24 13 L 24 24 L 13 24 L 13 26 L 24 26 L 24 37 L 26 37 L 26 26 L 37 26 L 37 24 L 26 24 L 26 13 Z M 24 13 "/>
+              <path
+                d="M 25 2 C 12.308594 2 2 12.308594 2 25 C 2 37.691406 12.308594 48 25 48 C 37.691406 48 48 37.691406 48 25 C 48 12.308594 37.691406 2 25 2 Z M 25 4 C 36.609375 4 46 13.390625 46 25 C 46 36.609375 36.609375 46 25 46 C 13.390625 46 4 36.609375 4 25 C 4 13.390625 13.390625 4 25 4 Z M 24 13 L 24 24 L 13 24 L 13 26 L 24 26 L 24 37 L 26 37 L 26 26 L 37 26 L 37 24 L 26 24 L 26 13 Z M 24 13 "
+              />
             </g>
           </svg>
-          <!-- <img src="./assets/img/icon-plus.svg" /> -->
         </a>
       </div>
-      <div id="post__list" class="row">
-      </div>
+      <div id="post__list" class="row"></div>
     </section>
 
     <section id="open-edit" class="modal">
@@ -83,7 +102,7 @@
             <span id="inputBiographyError" class="form__error"></span>
           </div>
           <div class="container__form__input">
-            <input type="file" name="" id="inputUserImageFile" accept="image/*" >
+            <input type="file" name="" id="inputUserImageFile" accept="image/*" />
           </div>
           <button id="btnUpdateUser" class="form__btn" type="button">Actualizar</button>
         </form>
@@ -96,10 +115,10 @@
         <h3 class="modal-content--title">Agregar publicacion.</h3>
         <form id="formAddPost">
           <div class="container__form__input">
-            <input type="file" name="" id="inputPostFile" accept="image/*" >
+            <input type="file" name="" id="inputPostFile" accept="image/*" />
           </div>
           <div class="container__form__input">
-            <textarea  class="form__input" id="inputPostDescription" cols="30" rows="5" placeholder="Descripcion"></textarea>
+            <textarea class="form__input" id="inputPostDescription" cols="30" rows="5" placeholder="Descripcion"></textarea>
             <span id="inputPostDescriptionError" class="form__error"></span>
           </div>
           <button id="btnCreatePost" class="form__btn" type="button">Agregar</button>
@@ -110,29 +129,23 @@
     <section id="open-post" class="modal">
       <div class="modal-content modal-post">
         <figure>
-          <img id="postImg" src="" alt="Imagen de la publicacion">
+          <img id="postImg" src="" alt="Imagen de la publicacion" />
         </figure>
         <div class="modal-post__details">
           <div class="modal-post__details--header">
-            <div id="postHeader">
-            </div>
+            <div id="postHeader"></div>
             <div class="modal-close">
               <span id="close-post">&times;</span>
             </div>
           </div>
           <div class="modal-post__details--description">
-            <div id="postDescription">
-
-            </div>
+            <div id="postDescription"></div>
             <p><span id="postCommentAmount"></span> Comentarios</p>
           </div>
-          <div id="postCommentList" class="modal-post__details--comments">
-          </div>
-          <div id="postFooter" class="modal-post__details--footer">
-
-          </div>
+          <div id="postCommentList" class="modal-post__details--comments"></div>
+          <div id="postFooter" class="modal-post__details--footer"></div>
           <div class="modal-post__details--addComent">
-            <input id="inputComment" class="form__input" type="text" placeholder="Agrega un comentario...">
+            <input id="inputComment" class="form__input" type="text" placeholder="Agrega un comentario..." />
             <a id="sentComment">Publicar</a>
           </div>
         </div>
