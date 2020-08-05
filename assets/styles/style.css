@@ -33,9 +33,33 @@ body{
 .header__access--home img{
   width: 35px;
 }
-.header__access__user{
+.header__access__user > div{
   display: flex;
   align-items: center;
+}
+.header__access__user  p{
+  margin: 0;
+}
+.header__access__user > ul{
+  text-align: center;
+  display: none;
+  line-height: 20px;
+  text-decoration: none;
+  margin: 0;
+  margin-top: -10px;
+  list-style-type: none;
+}
+.header__access__user > ul a{
+  text-decoration: none;
+  color: grey;
+} 
+.header__access__user > ul> li a:hover{
+  text-decoration: underline;
+  Color:lightskyblue;
+  cursor: pointer;
+}
+.header__access__user:hover > ul {
+  display: block;
 }
 .header__access__user--image{
   border: 1px solid lightskyblue;

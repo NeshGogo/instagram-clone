@@ -268,3 +268,7 @@ const addPostComment = async (postId) => {
     }
   }
 }
+
+document.querySelector('#signOut').onclick = () => {
+  auth.signOut();
+}
