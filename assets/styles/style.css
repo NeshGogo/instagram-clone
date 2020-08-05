@@ -64,7 +64,7 @@ body{
   display: block;
 }
 .header__access__user--image{
-  border: 1px solid lightskyblue;
+  border: 1px solid #29A5DB;
   width: 40px;
   height: 40px;
   border-radius: 50%;

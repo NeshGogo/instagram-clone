@@ -10,7 +10,6 @@
   overflow: hidden;
   line-height: 180px;
   text-align: center;
-  background-color: maroon;
   margin-right: 30px;
 }
 
@@ -37,8 +36,12 @@
   outline: none;
   cursor: pointer;
 }
+.info__user-name button:hover{
+  background-color: rgb(59, 180, 255);
+  color: whitesmoke;
+}
 .info__user-name button:active{
-  box-shadow: 0px 0px 6px  lightskyblue;
+  box-shadow: 0px 0px 6px  rgb(59, 180, 255);
 }
 .info__posts{
   color: grey;
@@ -75,9 +78,19 @@
   margin-right: 10px;
 }
 
-.posts__header img{
+.posts__header svg{
   width: 40px;
+  height: 40px;
   cursor: pointer;
+  stroke:none;
+  fill-rule:nonzero;
+  fill:rgb(40%,40%,40%);
+  fill-opacity:1;
+}
+.posts__header svg:hover {
+  background-color: whitesmoke;
+  fill: rgb(59, 180, 255);
+  border-radius: 50%;
 }
 
 .post a img{
