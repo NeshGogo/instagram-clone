@@ -24,6 +24,7 @@
         </div>
       </div>
     </header>
+
     <section class="info">
       <img id="userImage" src="./assets/img/user-account.png" alt="Imagen de perfil" />
       <div>
@@ -39,6 +40,7 @@
         <p id="userBiography" class="info__biography"></p>
       </div>
     </section>
+
     <section class="posts">
       <div class="posts__header">
         <h4>Publicaciones</h4>
@@ -46,24 +48,10 @@
           <img src="./assets/img/icon-plus.svg" />
         </a>
       </div>
-      <div class="row start-xs">
-        <div class="col-xs-4">
-          <div class="post">
-            <img src="" alt="Image de una plicacion" />
-          </div>
-        </div>
-        <div class="col-xs-4">
-          <div class="post">
-            <img src="" alt="Image de una plicacion" />
-          </div>
-        </div>
-        <div class="col-xs-4">
-          <div class="post">
-            <img src="" alt="Image de una plicacion" />
-          </div>
-        </div>
+      <div id="post__list" class="row">
       </div>
     </section>
+
     <section id="open-edit" class="modal">
       <div class="modal-content">
         <span id="close-edit" class="modal-close">&times;</span>
@@ -88,11 +76,12 @@
         </form>
       </div>
     </section>
+
     <section id="open-addPost" class="modal">
       <div class="modal-content">
         <span id="close-addPost" class="modal-close">&times;</span>
         <h3 class="modal-content--title">Agregar publicacion.</h3>
-        <form>
+        <form id="formAddPost">
           <div class="container__form__input">
             <input type="file" name="" id="inputPostFile" accept="image/*" >
           </div>
@@ -104,6 +93,39 @@
         </form>
       </div>
     </section>
+
+    <section id="open-post" class="modal">
+      <div class="modal-content modal-post">
+        <figure>
+          <img id="postImg" src="" alt="Imagen de la publicacion">
+        </figure>
+        <div class="modal-post__details">
+          <div class="modal-post__details--header">
+            <div id="postHeader">
+            </div>
+            <div class="modal-close">
+              <span id="close-post">&times;</span>
+            </div>
+          </div>
+          <div class="modal-post__details--description">
+            <div id="postDescription">
+
+            </div>
+            <p><span id="postCommentAmount"></span> Comentarios</p>
+          </div>
+          <div id="postCommentList" class="modal-post__details--comments">
+          </div>
+          <div id="postFooter" class="modal-post__details--footer">
+
+          </div>
+          <div class="modal-post__details--addComent">
+            <input id="inputComment" class="form__input" type="text" placeholder="Agrega un comentario...">
+            <a id="sentComment">Publicar</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>

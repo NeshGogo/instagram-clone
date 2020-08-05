@@ -6,7 +6,10 @@ body{
 }
 
 .header{
-  margin: 0;
+  position: fixed;
+  width: 100%;
+  background-color: white;
+  top: 0;
   height: 80px;
   display: flex;
   justify-content: space-between;
@@ -124,10 +127,6 @@ body{
   transition: all 0.3s;
   overflow: hidden;
   opacity: 0;
-}
-.modal:target{
-  opacity: 1;
-  pointer-events: auto;
 }
 .modal-content{
   background-color: white;
