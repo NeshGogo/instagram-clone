@@ -230,7 +230,6 @@ const getPostComments = (postId) => {
     .where('postRef', '==', postId)
     .orderBy('date', 'desc')
     .onSnapshot((querySnapshots) => {
-      debugger;
       postCommentList.innerHTML = '';
       querySnapshots.forEach(docRef => {
         appendComment(docRef.data());
@@ -241,6 +240,8 @@ const getPostComments = (postId) => {
 const appendComment = (comment) => {
   firestore.collection(USERS).doc(comment.userRef).get().then(userRef => {
     const user = userRef.data();
+    const date = new Date(comment.date.seconds * 1000);
+    console.log(date.toLocaleTimeString())
     postCommentList.innerHTML += `
       <div>
         <img
@@ -249,6 +250,8 @@ const appendComment = (comment) => {
         alt="Imagen del usuario">
         <p><strong>${user.userName}</strong> ${comment.description}</p>
       </div>
+      <small><i>${date.toLocaleString()}</i></small> 
+      <br><br>
     `;
   });
 

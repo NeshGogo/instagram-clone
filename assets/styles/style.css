@@ -16,7 +16,6 @@ body{
   border: 1px solid lightgray;
   box-shadow: 0px 3px 6px lightgrey;
   align-items: center;
-  padding-right: 7px;
 }
 .header__hero img{
   width: 150px;
@@ -32,6 +31,9 @@ body{
 }
 .header__access--home img{
   width: 35px;
+}
+.header__access__user {
+  margin-right: 10px;
 }
 .header__access__user > div{
   display: flex;
