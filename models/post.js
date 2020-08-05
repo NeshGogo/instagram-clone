@@ -7,10 +7,4 @@ export class  Post extends Publication{
     this.likes = likes;
     this.commentsRef = commentsRef;
   }
-  getLikesCount(){
-    return this.likes.length;
-  }
-  getCommentsCount(){
-    return this.commentsRef.length;
-  }
 }
