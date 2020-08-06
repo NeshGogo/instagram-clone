@@ -70,7 +70,7 @@ const signIn = (email, password) => {
   auth.signInWithEmailAndPassword(email, password)
     .then(() => {
       setTimeout(() => {
-        window.location.href = './profile.html';
+        window.location.href = './home.html';
       }, 500);
     })
     .catch(error => {

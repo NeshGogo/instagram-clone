@@ -16,7 +16,7 @@
       <img src="./assets/img/logo.png" alt="Logo de instagram" />
     </div>
     <div class="header__search">
-      <input class="form__input"  type="text"placeholder="¿Que deseas buscar?" id="headerSearchInput" >
+      <input class="form__input"  type="text"placeholder="¿Quien deseas buscar?" id="headerSearchInput" >
       <a>Buscar</a>
     </div>
     <div class="header__access">
@@ -49,7 +49,33 @@
     <section id="homePosts" class="post-list">
       
     </section>
+    <section id="open-post" class="modal">
+      <div class="modal-content modal-post">
+        <figure>
+          <img id="postImg" src="" alt="Imagen de la publicacion" />
+        </figure>
+        <div class="modal-post__details">
+          <div class="modal-post__details--header">
+            <div id="postHeader"></div>
+            <div class="modal-close">
+              <span id="close-post">&times;</span>
+            </div>
+          </div>
+          <div class="modal-post__details--description">
+            <div id="postDescription"></div>
+            <p><span id="postCommentAmount"></span> Comentarios</p>
+          </div>
+          <div id="postCommentList" class="modal-post__details--comments"></div>
+          <div id="postFooter" class="modal-post__details--footer"></div>
+          <div class="modal-post__details--addComent">
+            <input id="ModalPostinputComment" class="form__input" type="text" placeholder="Agrega un comentario..." />
+            <a id="sentComment">Publicar</a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+  
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>

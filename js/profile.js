@@ -254,7 +254,6 @@ const appendComment = (comment) => {
       <br><br>
     `;
   });
-
 }
 const addPostComment = async (postId) => {
   const inputComment = document.querySelector('#inputComment');
