@@ -17,8 +17,9 @@ const postImg = document.querySelector('#postImg');
 const postHeader = document.querySelector('#postHeader');
 const postDescription = document.querySelector('#postDescription');
 const postCommentList = document.querySelector('#postCommentList');
-const postFooter = document.querySelector('#postFooter');
+const modalPostLikes = document.querySelector('#modalPostLikes');
 const sentComment = document.querySelector('#sentComment');
+const modalPostLikeIcon = document.querySelector('#modalPostLikeIcon');
 
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
@@ -92,7 +93,7 @@ const getLastTwoPostCommets = (postId) => {
   firestore.collection(COMMENTS)
     .where('postRef', '==', postId)
     .orderBy('date', 'desc').limit(2)
-    .get().then(docRefs => {
+    .onSnapshot(docRefs => {
       const postComments = document.querySelector(`#postComments-${postId}`);
       postComments.innerHTML = '';
       if (docRefs.size > 0) {
@@ -129,7 +130,6 @@ const addPostLike = async (postId) => {
   const docRef = firestore.collection(POSTS).doc(postId);
   const post = (await docRef.get()).data();
   const liked = !post.likesRef.includes(currentUser.id);
-  console.log(currentUser);
   docRef.update({
     likes: liked ? post.likes + 1 : post.likes - 1,
     likesRef: liked ?
@@ -144,6 +144,7 @@ const ActiveOnChangePost = (postId, user) => {
       const postLikes = document.querySelector(`#postLikes-${postId}`);
       const postLikeIcon = document.querySelector(`#postLikeIcon-${postId}`)
       const post = { id: postId, ...snapShot.data() };
+      document.querySelector(`#openPost-${post.id}`).onclick = () => showPost(post, user);
       const likeIcon = post.likesRef.includes(currentUser.id) ?
         './assets/img/icon-heart-red.png'
         : './assets/img/icon-heart-outline.png';
@@ -158,6 +159,10 @@ const ActiveOnChangePost = (postId, user) => {
 
 const showPost = (post, postUser) => {
   const postCommentAmount = document.querySelector('#postCommentAmount');
+  let liked = post.likesRef.includes(currentUser.id) ? true: false;
+  const likeIcon = liked?
+        './assets/img/icon-heart-red.png'
+        : './assets/img/icon-heart-outline.png';
   postImg.src = post.imageUrl;
   postHeader.innerHTML = `
     <img
@@ -173,10 +178,10 @@ const showPost = (post, postUser) => {
       alt="Imagen del usuario">
     <p><strong>${postUser.userName}</strong> ${post.description}</p>
   `;
+  modalPostLikeIcon.innerHTML = `<img src="${likeIcon}" alt="icono de favorito">`;
   postCommentAmount.innerHTML = post.commentsRef.length
-  postFooter.innerHTML = `
-    <p>${post.likes} Me gusta</p>
-  `;
+  modalPostLikes.innerText = post.likes;
+
   getPostComments(post.id);
   sentComment.onclick = () => {
     const input = document.querySelector('#ModalPostinputComment');
@@ -184,6 +189,16 @@ const showPost = (post, postUser) => {
     input.value = '';
     getPostComments(post.id);
   };
+  modalPostLikeIcon.onclick = () => {
+    liked = !liked;
+    const icon = liked?
+        './assets/img/icon-heart-red.png'
+        : './assets/img/icon-heart-outline.png';
+    post.likes = liked? post.likes + 1 : post.likes - 1;
+    modalPostLikeIcon.innerHTML = `<img src="${icon}" alt="icono de favorito">`;
+    modalPostLikes.innerText = post.likes;
+    addPostLike(post.id);
+  }
   setTimeout(() => {
     openPost.style.opacity = '1';
     openPost.style.pointerEvents = 'auto';
@@ -215,7 +230,7 @@ const appendPostComment = async (comment) => {
         alt="Imagen del usuario">
         <p><strong>${user.userName}</strong> ${comment.description}</p>
       </div>
-      <small><i>${date.toLocaleString()}</i></small> 
+      <small><i>${date.toLocaleString()}</i></small>
       <br><br>
     `;
 }
@@ -225,7 +240,8 @@ document.getElementById('close-post').onclick = () => {
   postHeader.innerHTML = '';
   postDescription.innerHTML = '';
   postCommentList.innerHTML = '';
-  postFooter.innerHTML = '';
+  modalPostLikes.innerHTML = '';
+  modalPostLikeIcon.innerHTML = '';
   // unsubscribe();
   setTimeout(() => {
     openPost.style.opacity = '0';

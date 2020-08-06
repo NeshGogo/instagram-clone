@@ -280,27 +280,39 @@ body{
   height: 5%;
   border-top: 1px solid lightgrey;
   border-bottom: 1px solid lightgrey;
-  font-weight: 700;
   font-style: italic;
   padding-left: 10px;
   font-size: 14px;
-  color: grey;
-  padding-top: 10px;
+  color: goldenrod;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.modal-post__details--footer{
+  display: flex;
+  align-items: center;
 }
 .modal-post__details--footer > p {
   margin:0 ;
-  color: goldenrod;
+}
+.modal-post__details--footer img{
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
 }
 .modal-post__details--addComent{
   margin-top: 5%;
   display: flex;
-  color: lightskyblue;;
+  color: #29A5DB;;
+  align-items: flex-end;
+}
+.modal-post__details--addComent input{
+  color: black;
+  font-weight: 300;
+}
+.modal-post__details--addComent input::placeholder{
+  font-weight: lighter;
 }
 .modal-post__details--addComent a{
   padding-top: 8px;
-}
-
-.modal-post__details--addComent a:hover{
-  text-decoration: underline;
   cursor: pointer;
 }
