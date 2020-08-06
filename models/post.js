@@ -1,10 +1,11 @@
 import { Publication } from "./publication.js";
 
 export class  Post extends Publication{
-  constructor(userRef, description, imageUrl, likes = [], commentsRef = []) {
-    super(userRef, description);
+  constructor(userRef,userName, description, imageUrl, likes = 0, commentsRef = [], likesRef = []) {
+    super(userRef, userName,description);
     this.imageUrl = imageUrl;
     this.likes = likes;
     this.commentsRef = commentsRef;
+    this.likesRef = likesRef;
   }
 }

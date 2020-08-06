@@ -169,7 +169,7 @@ btnCreatePost.onclick = async () => {
       const storageRef = storage.ref(`${currentUserId}/posts/${Date.now()}-${file.name}`)
       await storageRef.put(file);
       let url = await storageRef.getDownloadURL();
-      const post = new Post(currentUserId, inputPostDescription.value, url);
+      const post = new Post(currentUserId, userApp.userName,inputPostDescription.value, url);
       await firestore.collection(POSTS).add({ ...post });
       userApp.post += 1;
       await firestore.collection(USERS).doc(currentUserId)
@@ -200,7 +200,7 @@ const showPost = (post) => {
   `;
   postCommentAmount.innerHTML = post.commentsRef.length
   postFooter.innerHTML = `
-    <p>${post.likes.length} likes</p>
+    <p>${post.likes} Me gusta</p>
   `;
   getPostComments(post.id);
   sentComment.onclick = () => addPostComment(post.id);
@@ -260,7 +260,7 @@ const addPostComment = async (postId) => {
   const inputComment = document.querySelector('#inputComment');
   if (inputComment.value !== '') {
     try {
-      const comment = new Comment(currentUserId, inputComment.value, postId)
+      const comment = new Comment(currentUserId, userApp.userName, inputComment.value, postId)
       const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
       await firestore.collection(POSTS).doc(postId).update({
         commentsRef: firebase.firestore.FieldValue.arrayUnion(commentRef.id)

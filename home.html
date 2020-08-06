@@ -16,7 +16,7 @@
       <img src="./assets/img/logo.png" alt="Logo de instagram" />
     </div>
     <div class="header__search">
-      <input class="form__input"  type="text"placeholder="¿Que deseas buscar?" id="">
+      <input class="form__input"  type="text"placeholder="¿Que deseas buscar?" id="headerSearchInput" >
       <a>Buscar</a>
     </div>
     <div class="header__access">
@@ -30,7 +30,6 @@
             d="M19,11v9h-5v-6h-4v6H5v-9H3.606L12,3.445L20.394,11H19z"
           />
         </svg>
-        <!-- <img src="./assets/img/icon-home.svg" alt="icono de home" /> -->
       </a>
       <div class="header__access__user">
         <div>
@@ -47,35 +46,8 @@
     </div>
   </header>
   <main class="main">
-    <section class="post-list">
-      <div class="post-card">
-        <div class="post-card--header">
-          <img src="./assets/img/user-account.png" alt="nombre del usuario del post">
-          <p>neshgogo</p>
-        </div>
-        <img class="post-card--img" src="./assets/img/user-account.png" alt="Imagen del post">
-        <div class="post-card--footer-img">
-          <a><img src="./assets/img/icon-heart-red.png" alt=""></a>
-          <a><img src="./assets/img/icon-comment.png" alt=""></a>
-          <p>200 Me gusta</p>
-        </div>
-        <div class="post-card--description">
-          <h4>Descripcion</h4>
-          <p><strong>neshgogo</strong> Esta fue una grandiosa foto.</p>
-        </div>
-        <div class="post-card--comments">
-          <h4>Comentarios</h4>
-          <a href="">Ver los <span></span> comentarios</a>
-          <div>
-            <p><strong>neshgogo</strong> tu eres muy duro loco.</p>
-          </div>
-        </div>
-        <div class="post--card--add-comment">
-          <input class="form__input" type="text" placeholder="Agrega un comentario..." name="" id="">
-          <a id="sentComment">Publicar</a>
-        </div>
-        
-      </div>
+    <section id="homePosts" class="post-list">
+      
     </section>
   </main>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
