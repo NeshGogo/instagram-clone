@@ -15,13 +15,10 @@
 .main {
   margin-top: 95px;
 }
-.post-list{
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
+
 .post-card{
-  width: 35%;
+  margin: 0 auto;
+  width: 40%;
   border: 1px solid lightgrey;
   border-radius: 3px;
   margin-bottom: 50px;
@@ -91,6 +88,7 @@
   font-style: italic;
   font-weight: lighter;
   font-size: 12px;
+  cursor: pointer;
   color: black;
 }
 .post-card--comments a:hover{
@@ -104,19 +102,20 @@
   color: grey;
   font-weight: 500;
 }
-.post--card--add-comment{
+.post-card--add-comment{
   margin:10px;
   display: flex;
   align-items: flex-end;
-  color: lightskyblue;;
+  color: #29A5DB;;
 }
-.post--card--add-comment input{
+.post-card--add-comment input{
   border-bottom: 1px solid lightgrey;
+  color: black;
+  font-weight: 300;
 }
-.post--card--add-comment input::placeholder{
+.post-card--add-comment input::placeholder{
   font-weight: lighter;
 }
-.post--card--add-comment a:hover{
-  text-decoration: underline;
+.post-card--add-comment a{
   cursor: pointer;
 }

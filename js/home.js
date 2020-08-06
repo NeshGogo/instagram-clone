@@ -58,7 +58,7 @@ firestore.collection(POSTS).orderBy('date', 'desc').get().then(async (snapshots)
           <div id="postComments-${post.id}">
           </div>
         </div>
-        <div class="post--card--add-comment">
+        <div class="post-card--add-comment">
           <input id="inputComment-${post.id}" class="form__input" type="text" placeholder="Agrega un comentario...">
           <a id="addPostComment-${post.id}" >Publicar</a>
         </div>
