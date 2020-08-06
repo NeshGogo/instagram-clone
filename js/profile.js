@@ -1,6 +1,5 @@
 import { firestore, auth, storage } from '../services/firebase.js';
 import firebase from '../services/firebase.js';
-import { User } from '../models/user.js';
 import { Post } from '../models/post.js';
 import { Comment } from '../models/comment.js';
 
@@ -8,8 +7,7 @@ import { Comment } from '../models/comment.js';
 const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
-let currentUserId = '';
-let userApp;
+let userApp ;
 
 // HtmlElements de la pagina principal
 const headerUserImage = document.querySelector('#headerUserImage');
@@ -38,15 +36,17 @@ const postImg = document.querySelector('#postImg');
 const postHeader = document.querySelector('#postHeader');
 const postDescription = document.querySelector('#postDescription');
 const postCommentList = document.querySelector('#postCommentList');
-const postFooter = document.querySelector('#postFooter');
 const sentComment = document.querySelector('#sentComment');
+const modalPostLikes = document.querySelector('#modalPostLikes');
+const modalPostLikeIcon = document.querySelector('#modalPostLikeIcon');
 
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
-    currentUserId = userAccount.uid;
+    userApp = {id: userAccount.uid }
     firestore.collection(USERS).doc(userAccount.uid)
       .onSnapshot(function (userRef) {
-        init(userRef.data());
+        userApp = { ...userApp, ...userRef.data() };
+        init();
       });
   } else {
     window.location.href = './index.html';
@@ -60,7 +60,7 @@ firestore.collection(POSTS)
     postList.innerHTML = '';
     querySnapShot.forEach(postDoc => {
       const post = { id: postDoc.id, ...postDoc.data() };
-      if (post.userRef === currentUserId) {
+      if (post.userRef === userApp.id) {
         postList.innerHTML += `
           <div class="col-xs-12 
             col-sm-8
@@ -80,26 +80,28 @@ firestore.collection(POSTS)
     })
   });
 
-const init = (user) => {
-  if (user.imageUrl !== '') {
-    headerUserImage.src = user.imageUrl;
-    userImage.src = user.imageUrl;
+const init = () => {
+  if (userApp.imageUrl !== '') {
+    headerUserImage.src = userApp.imageUrl;
+    userImage.src = userApp.imageUrl;
   }
-  headerUserFullname.innerText = user.fullName;
-  userName.innerText = user.userName;
-  userFullname.innerText = user.fullName;
-  postCount.innerText = user.post;
-  userBiography.innerText = user.biography || '';
-  userApp = new User(
-    user.email,
-    user.userName,
-    user.fullName,
-    user.imageUrl,
-    user.biography,
-    user.post,
-  );
+  headerUserFullname.innerText = userApp.fullName;
+  userName.innerText = userApp.userName;
+  userFullname.innerText = userApp.fullName;
+  postCount.innerText = userApp.post;
+  userBiography.innerText = userApp.biography || '';
 };
-
+const addPostLike = async (postId) => {
+  const docRef = firestore.collection(POSTS).doc(postId);
+  const post = (await docRef.get()).data();
+  const liked = !post.likesRef.includes(userApp.id);
+  docRef.update({
+    likes: liked ? post.likes + 1 : post.likes - 1,
+    likesRef: liked ?
+      firebase.firestore.FieldValue.arrayUnion(userApp.id)
+      : firebase.firestore.FieldValue.arrayRemove(userApp.id),
+  })
+}
 btnEdit.onclick = () => {
   const openEdit = document.getElementById('open-edit');
   inputUserName.value = userApp.userName;
@@ -125,12 +127,12 @@ btnUpdateUser.onclick = async () => {
   userApp.biography = inputBiography.value;
   const file = inputUserImageFile.files[0];
   if (file) {
-    const storageRef = storage.ref(`${currentUserId}/profile.${file.name.split('.')[1]}`)
+    const storageRef = storage.ref(`${userApp.id}/profile.${file.name.split('.')[1]}`)
     storageRef.put(file);
     if (userApp.imageUrl === '') {
       storageRef.getDownloadURL().then(url => {
         userApp.imageUrl = url;
-        firestore.collection(USERS).doc(currentUserId).set({ ...userApp }, { merge: true });
+        firestore.collection(USERS).doc(userApp.id).set({ ...userApp }, { merge: true });
       });
     } else {
       setTimeout(() => {
@@ -138,7 +140,7 @@ btnUpdateUser.onclick = async () => {
       }, 1000);
     }
   } else {
-    await firestore.collection(USERS).doc(currentUserId).set({ ...userApp });
+    await firestore.collection(USERS).doc(userApp.id).set({ ...userApp });
   }
   document.getElementById('close-edit').onclick();
 }
@@ -166,13 +168,13 @@ btnCreatePost.onclick = async () => {
   const file = inputPostFile.files[0];
   if (file) {
     try {
-      const storageRef = storage.ref(`${currentUserId}/posts/${Date.now()}-${file.name}`)
+      const storageRef = storage.ref(`${userApp.id}/posts/${Date.now()}-${file.name}`)
       await storageRef.put(file);
       let url = await storageRef.getDownloadURL();
-      const post = new Post(currentUserId, userApp.userName,inputPostDescription.value, url);
+      const post = new Post(userApp.id, userApp.userName,inputPostDescription.value, url);
       await firestore.collection(POSTS).add({ ...post });
       userApp.post += 1;
-      await firestore.collection(USERS).doc(currentUserId)
+      await firestore.collection(USERS).doc(userApp.id)
       .update({post: userApp.post});
     } catch (error) {
       console.log(error);
@@ -183,6 +185,10 @@ btnCreatePost.onclick = async () => {
 
 const showPost = (post) => {
   const postCommentAmount =  document.querySelector('#postCommentAmount');
+  let liked = post.likesRef.includes(userApp.id) ? true: false;
+  const likeIcon = liked?
+        './assets/img/icon-heart-red.png'
+        : './assets/img/icon-heart-outline.png';
   postImg.src = post.imageUrl;
   postHeader.innerHTML = `
     <img
@@ -199,11 +205,21 @@ const showPost = (post) => {
     <p><strong>${userApp.userName}</strong> ${post.description}</p>
   `;
   postCommentAmount.innerHTML = post.commentsRef.length
-  postFooter.innerHTML = `
-    <p>${post.likes} Me gusta</p>
-  `;
+  modalPostLikeIcon.innerHTML = `<img src="${likeIcon}" alt="icono de favorito">`;
+  modalPostLikes.innerText = post.likes;
+
   getPostComments(post.id);
   sentComment.onclick = () => addPostComment(post.id);
+  modalPostLikeIcon.onclick = () => {
+    liked = !liked;
+    const icon = liked?
+        './assets/img/icon-heart-red.png'
+        : './assets/img/icon-heart-outline.png';
+    post.likes = liked? post.likes + 1 : post.likes - 1;
+    modalPostLikeIcon.innerHTML = `<img src="${icon}" alt="icono de favorito">`;
+    modalPostLikes.innerText = post.likes;
+    addPostLike(post.id);
+  }
   setTimeout(() => {
     openPost.style.opacity = '1';
     openPost.style.pointerEvents = 'auto';
@@ -215,7 +231,8 @@ document.getElementById('close-post').onclick = () => {
   postHeader.innerHTML = '';
   postDescription.innerHTML = '';
   postCommentList.innerHTML = '';
-  postFooter.innerHTML = '';
+  modalPostLikes.innerHTML = '';
+  modalPostLikeIcon.innerHTML = '';
   firestore.collection(COMMENTS).onSnapshot(() => { })();
   // unsubscribe();
   setTimeout(() => {
@@ -254,13 +271,12 @@ const appendComment = (comment) => {
       <br><br>
     `;
   });
-
 }
 const addPostComment = async (postId) => {
   const inputComment = document.querySelector('#inputComment');
   if (inputComment.value !== '') {
     try {
-      const comment = new Comment(currentUserId, userApp.userName, inputComment.value, postId)
+      const comment = new Comment(userApp.id, userApp.userName, inputComment.value, postId)
       const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
       await firestore.collection(POSTS).doc(postId).update({
         commentsRef: firebase.firestore.FieldValue.arrayUnion(commentRef.id)

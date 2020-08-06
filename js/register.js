@@ -100,7 +100,7 @@ const addUser = async (user) => {
       await firestore.collection(USERS).doc(account.user.uid).set({...user});
       let clicked = await swal('Registrado!', 'El usuario fue registrado exitosamente!!', 'success');
       if (clicked)
-        window.location.href = './profile.html'
+        window.location.href = './home.html'
     } catch (error) {
       console.log(error);
       error.code === 'auth/email-already-in-use'
