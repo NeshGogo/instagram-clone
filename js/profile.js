@@ -169,7 +169,7 @@ btnCreatePost.onclick = async () => {
       const storageRef = storage.ref(`${currentUserId}/posts/${Date.now()}-${file.name}`)
       await storageRef.put(file);
       let url = await storageRef.getDownloadURL();
-      const post = new Post(currentUserId, inputPostDescription.value, url);
+      const post = new Post(currentUserId, userApp.userName,inputPostDescription.value, url);
       await firestore.collection(POSTS).add({ ...post });
       userApp.post += 1;
       await firestore.collection(USERS).doc(currentUserId)
@@ -200,7 +200,7 @@ const showPost = (post) => {
   `;
   postCommentAmount.innerHTML = post.commentsRef.length
   postFooter.innerHTML = `
-    <p>${post.likes.length} likes</p>
+    <p>${post.likes} Me gusta</p>
   `;
   getPostComments(post.id);
   sentComment.onclick = () => addPostComment(post.id);
@@ -230,7 +230,6 @@ const getPostComments = (postId) => {
     .where('postRef', '==', postId)
     .orderBy('date', 'desc')
     .onSnapshot((querySnapshots) => {
-      debugger;
       postCommentList.innerHTML = '';
       querySnapshots.forEach(docRef => {
         appendComment(docRef.data());
@@ -241,6 +240,8 @@ const getPostComments = (postId) => {
 const appendComment = (comment) => {
   firestore.collection(USERS).doc(comment.userRef).get().then(userRef => {
     const user = userRef.data();
+    const date = new Date(comment.date.seconds * 1000);
+    console.log(date.toLocaleTimeString())
     postCommentList.innerHTML += `
       <div>
         <img
@@ -249,6 +250,8 @@ const appendComment = (comment) => {
         alt="Imagen del usuario">
         <p><strong>${user.userName}</strong> ${comment.description}</p>
       </div>
+      <small><i>${date.toLocaleString()}</i></small> 
+      <br><br>
     `;
   });
 
@@ -257,7 +260,7 @@ const addPostComment = async (postId) => {
   const inputComment = document.querySelector('#inputComment');
   if (inputComment.value !== '') {
     try {
-      const comment = new Comment(currentUserId, inputComment.value, postId)
+      const comment = new Comment(currentUserId, userApp.userName, inputComment.value, postId)
       const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
       await firestore.collection(POSTS).doc(postId).update({
         commentsRef: firebase.firestore.FieldValue.arrayUnion(commentRef.id)
@@ -267,4 +270,8 @@ const addPostComment = async (postId) => {
       console.log(error);
     }
   }
+}
+
+document.querySelector('#signOut').onclick = () => {
+  auth.signOut();
 }

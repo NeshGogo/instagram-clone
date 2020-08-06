@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instagram - Home</title>
+  <link rel="shortcut icon" href="./assets/img/icon-instagram.svg" type="image/x-icon" />
+  <link rel="stylesheet" href="./assets/styles/style.css" />
+  <link rel="stylesheet" href="./assets/styles/home.css" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="header__hero">
+      <img src="./assets/img/logo.png" alt="Logo de instagram" />
+    </div>
+    <div class="header__search">
+      <input class="form__input"  type="text"placeholder="¿Que deseas buscar?" id="headerSearchInput" >
+      <a>Buscar</a>
+    </div>
+    <div class="header__access">
+      <a class="header__access--home" href="./home.html">
+        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px">
+          <path
+            fill="none"
+            stroke="#000000"
+            stroke-miterlimit="10"
+            stroke-width="2"
+            d="M19,11v9h-5v-6h-4v6H5v-9H3.606L12,3.445L20.394,11H19z"
+          />
+        </svg>
+      </a>
+      <div class="header__access__user">
+        <div>
+          <div class="header__access__user--image">
+            <img id="headerUserImage" src="./assets/img/user-account.png" alt="imagen del perfil del usuario" />
+          </div>
+          <p id="headerUserFullname"></p>
+        </div>
+        <ul>
+          <li><a href="./profile.html">Perfil</a></li>
+          <li><a id="signOut">Cerrar sesion</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+  <main class="main">
+    <section id="homePosts" class="post-list">
+      
+    </section>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
+  <script type="module" src="js/home.js"></script>
+</body>
+
+</html>

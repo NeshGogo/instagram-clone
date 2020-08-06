@@ -1,8 +1,8 @@
 import { Publication } from "./publication.js";
 
 export class Comment extends Publication{
-  constructor(userRef,description, postRef) {
-    super(userRef, description);
+  constructor(userRef,userName,description, postRef) {
+    super(userRef, userName,description);
     this.postRef = postRef;
   }
 }
