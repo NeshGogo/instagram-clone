@@ -1,10 +1,11 @@
+import { Comment } from '../models/comment.js'
 import { auth, firestore } from '../services/firebase.js';
 
 const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
 let currentUserId = '';
-// let userApp;
+let currentUserName = '';
 
 // HtmlElements del header.
 const headerUserImage = document.querySelector('#headerUserImage');
@@ -15,29 +16,22 @@ auth.onAuthStateChanged(async (userAccount) => {
     currentUserId = userAccount.uid;
     firestore.collection(USERS).doc(userAccount.uid)
       .onSnapshot(function (userRef) {
-        init(userRef.data());
-        currentUserId = userAccount.uid;
+        const user = { ...userRef.data() };
+        currentUserName = user.userName;
+        headerUserFullname.innerText = user.fullName;
+        headerUserImage.src = user.imageUrl;
       });
   } else {
     window.location.href = './index.html';
   }
 });
 
-const init = (user) => {
-  headerUserFullname.innerText = user.fullName;
-  headerUserImage.src = user.imageUrl;
-}
 
-firestore.collection(POSTS).orderBy('date', 'desc').onSnapshot(async (snapshots) => {
+firestore.collection(POSTS).orderBy('date', 'desc').get().then(async (snapshots) => {
   const postList = document.querySelector('#homePosts');
   postList.innerHTML = '';
   snapshots.forEach(async (postRef) => {
     const post = { id: postRef.id, ...postRef.data() };
-    const likeIcon = post.likesRef.includes(currentUserId) ?
-      './assets/img/icon-heart-red.png'
-      : './assets/img/icon-heart-outline.png';
-
-    const comments = await getPostCommets(post.id);
 
     postList.innerHTML += `
       <div class="post-card">
@@ -47,9 +41,9 @@ firestore.collection(POSTS).orderBy('date', 'desc').onSnapshot(async (snapshots)
         </div>
         <img class="post-card--img" src="${post.imageUrl}" alt="Imagen del post">
         <div class="post-card--footer-img">
-          <a><img src="${likeIcon}" alt="icono de favorito"></a>
+          <a><img id="postLikeIcon-${post.id}" alt="icono de favorito"></a>
           <a><img src="./assets/img/icon-comment.png" alt=""></a>
-          <p>${post.likes} Me gusta</p>
+          <p><span id="postLikes-${post.id}">${post.likes}</span> Me gusta</p>
         </div>
         <div class="post-card--description">
           <h4>Descripcion</h4>
@@ -57,43 +51,83 @@ firestore.collection(POSTS).orderBy('date', 'desc').onSnapshot(async (snapshots)
         </div>
         <div class="post-card--comments">
           <h4>Comentarios</h4>
-          <a href="">Ver los ${post.commentsRef.length} comentarios</a>
-          <div>
-            ${comments}
+          <a>
+            Ver los <span id="postCommentAmout-${post.id}">${post.commentsRef.length}</span> comentarios
+          </a>
+          <div id="postComments-${post.id}">
           </div>
         </div>
         <div class="post--card--add-comment">
-          <input class="form__input" type="text" placeholder="Agrega un comentario...">
-          <a >Publicar</a>
+          <input id="inputComment-${post.id}" class="form__input" type="text" placeholder="Agrega un comentario...">
+          <a id="addPostComment-${post.id}" >Publicar</a>
         </div>
       </div>
     `;
+    const comments =  getPostCommets(post.id);
     const user = await getuserById(post.userRef);
     document.querySelector(`#postCartHeaderUserImg-${post.id}`).src = user.imageUrl;
     document.querySelector(`#postCartHeaderUserName-${post.id}`).innerText = user.userName;
     document.querySelector(`#postCartDescriptionUserName-${post.id}`).innerText = user.userName;
+    document.querySelector(`#addPostComment-${post.id}`).onclick = () => {
+      const inputComment = document.querySelector(`#inputComment-${post.id}`);
+      addPostComment(post.id, inputComment.value);
+      inputComment.value = '';
+    }
+    onPostChange(post.id)
   })
 })
 
-const getPostCommets = async (postId) => {
-  return await firestore.collection(COMMENTS)
+const getPostCommets = (postId) => {
+  // postComments-${postId}
+  firestore.collection(COMMENTS)
     .where('postRef', '==', postId)
-    .orderBy('date', 'desc')
-    .limit(2).get()
-    .then(async (querySnapShot) => {
-      let comments = ``;
-      querySnapShot.forEach(async (commentRef) => {
-        let comment = commentRef.data();
-        comments += `<p><strong>${comment.userName}</strong> ${comment.description}</p>`;
+    .orderBy('date', 'desc').limit(2)
+    .onSnapshot(querySnapShot => {
+      const postComments = document.querySelector(`#postComments-${postId}`);
+      postComments.innerHTML = '';
+      querySnapShot.forEach(commentRef => {
+        const comment = commentRef.data();
+        postComments.innerHTML += `<p><strong>${comment.userName}</strong> ${comment.description}</p>`;
       });
-      return comments;
     });
 }
+
 const getuserById = async (id) => {
   const user = await firestore.collection(USERS)
     .doc(id).get();
   return user.data();
 }
+
+const addPostComment = async (postId, value) => {
+  if (value !== '') {
+    try {
+      const comment = new Comment(currentUserId, currentUserName, value, postId)
+      const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
+      await firestore.collection(POSTS).doc(postId).update({
+        commentsRef: firebase.firestore.FieldValue.arrayUnion(commentRef.id)
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+const onPostChange = (postId) => {
+  firestore.collection(POSTS).doc(postId)
+  .onSnapshot(snapShot => {
+    const postComment = document.querySelector(`#postCommentAmout-${postId}`);
+    const postLikes = document.querySelector(`#postLikes-${postId}`);
+    const postLikeIcon = document.querySelector(`#postLikeIcon-${postId}`)
+    const post = snapShot.data();
+    const likeIcon = post.likesRef.includes(currentUserId) ?
+      './assets/img/icon-heart-red.png'
+      : './assets/img/icon-heart-outline.png';
+    postLikes.innerText =  post.likes;
+    postComment.innerText = post.commentsRef.length;
+    postLikeIcon.src = likeIcon;
+  });
+}
+
 document.querySelector('#signOut').onclick = () => {
   auth.signOut();
 }
