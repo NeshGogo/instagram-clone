@@ -43,6 +43,7 @@ body{
   width: 40px;
 }
 .header__access__user {
+  position: relative;
   margin-right: 10px;
 }
 .header__access__user > div{
@@ -53,21 +54,32 @@ body{
   margin: 0;
 }
 .header__access__user > ul{
+  font-size: 14px;
+  padding: 10px;
+  border: 0.5px solid lightgrey;
+  padding-top: 15px;
+  position: absolute;
+  border-radius: 5px;
   text-align: center;
+  background-color: white;
   display: none;
-  line-height: 20px;
-  text-decoration: none;
-  margin: 0;
-  margin-top: -10px;
   list-style-type: none;
+  top: 15px;
+  left: 45px;
+}
+.header__access__user > ul > li{
+  border-bottom: 1px solid lightgrey;
+  margin-bottom: 10px;
 }
 .header__access__user > ul a{
   text-decoration: none;
   color: grey;
-} 
-.header__access__user > ul> li a:hover{
-  text-decoration: underline;
-  Color:lightskyblue;
+}
+.header__access__user > ul a:hover{
+  color: #29A5DB;
+}
+.header__access__user > ul> li:hover{
+  border-bottom: 1px solid #29A5DB;
   cursor: pointer;
 }
 .header__access__user:hover > ul {
@@ -85,7 +97,6 @@ body{
 }
 
 .header__access__user--image img{
-  background-color: maroon;
   border-radius: 50%;
   width: 90%;
   height: 90%;
@@ -274,6 +285,7 @@ body{
 .modal-post__details--comments p{
   font-weight: lighter;
   font-style: italic;
+  margin-right: 1px;
 }
 .modal-post__details--comments strong {
   color: grey;
@@ -302,7 +314,7 @@ body{
   margin-right: 10px;
 }
 .modal-post__details--addComent{
-  margin-top: 5%;
+  height: 8%;
   display: flex;
   color: #29A5DB;;
   align-items: flex-end;

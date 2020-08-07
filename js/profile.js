@@ -226,7 +226,7 @@ document.getElementById('close-addPost').onclick = () => {
 const addPost = async () => {
   try {
     const file = inputPostFile.files[0];
-    if (file === undefined) return;
+    if (!file) return;
     const uploadRef = await uploadFile(file, 'posts');
     const url = await uploadRef.getDownloadURL();
     const imageStorageRef = uploadRef.fullPath;

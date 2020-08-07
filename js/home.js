@@ -28,7 +28,7 @@ auth.onAuthStateChanged(async (userAccount) => {
       .onSnapshot(function (userRef) {
         currentUser = { ...currentUser, ...userRef.data() }
         headerUserFullname.innerText = currentUser.fullName;
-        headerUserImage.src = currentUser.imageUrl;
+        headerUserImage.src = currentUser.imageUrl || './assets/img/user-account.png';
       });
   } else {
     window.location.href = './index.html';
