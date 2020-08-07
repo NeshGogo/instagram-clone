@@ -7,7 +7,7 @@ import { Comment } from '../models/comment.js';
 const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
-let userApp ;
+let userApp;
 
 // HtmlElements de la pagina principal
 const headerUserImage = document.querySelector('#headerUserImage');
@@ -29,6 +29,9 @@ const btnUpdateUser = document.querySelector('#btnUpdateUser');
 
 // HtmlElements del modal de agregar post
 const btnCreatePost = document.querySelector('#btnCreatePost');
+const inputPostFile = document.querySelector('#inputPostFile');
+const inputPostDescription = document.querySelector('#inputPostDescription');
+const addPostTitle = document.querySelector('#addPostTitle');
 
 //HtmlElements del modal de open post
 const openPost = document.getElementById('open-post');
@@ -42,7 +45,7 @@ const modalPostLikeIcon = document.querySelector('#modalPostLikeIcon');
 
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
-    userApp = {id: userAccount.uid }
+    userApp = { id: userAccount.uid }
     firestore.collection(USERS).doc(userAccount.uid)
       .onSnapshot(function (userRef) {
         userApp = { ...userApp, ...userRef.data() };
@@ -67,14 +70,26 @@ firestore.collection(POSTS)
             col-md-6
             col-lg-4">
                 <div class=" post box ">
-                  <a id="${post.id}">
+                  <a id="post-${post.id}">
                     <img src="${post.imageUrl}" alt="Image de una plicacion" />
                   </a>
+                  <div class="post__options">
+                    <a id="postEdit-${post.id}"><img src="./assets/img/icon-edit.svg"></a>
+                    <a  id="postDelete-${post.id}"><img src="./assets/img/icon-delete.svg"></a>
+                  </div>
                 </div>
           </div>
         `;
         setTimeout(() => {
-          document.getElementById(post.id).onclick = () => showPost(post);
+          document.getElementById(`post-${post.id}`).onclick = () => showPost(post);
+          document.getElementById(`postEdit-${post.id}`).onclick = () => {
+            inputPostDescription.value = post.description;
+            inputPostFile.style.display = 'none';
+            btnCreatePost.innerText = 'Actualizar';
+            addPostTitle.innerText = 'Editar Publicacion';
+            showAddPost();
+          };
+          document.getElementById(`postDelete-${post.id}`).onclick = () => showPost(post);
         }, 0);
       }
     })
@@ -146,6 +161,13 @@ btnUpdateUser.onclick = async () => {
 }
 
 btnAddPost.onclick = () => {
+  inputPostFile.style.display = 'initial';
+  btnCreatePost.innerText = 'Agregar';
+  addPostTitle.innerText = 'Agregar Publicacion';
+  showAddPost()
+};
+
+const showAddPost = () => {
   const openEdit = document.getElementById('open-addPost');
   setTimeout(() => {
     openEdit.style.opacity = '1';
@@ -163,19 +185,17 @@ document.getElementById('close-addPost').onclick = () => {
 }
 
 btnCreatePost.onclick = async () => {
-  const inputPostFile = document.querySelector('#inputPostFile');
-  const inputPostDescription = document.querySelector('#inputPostDescription');
   const file = inputPostFile.files[0];
   if (file) {
     try {
       const storageRef = storage.ref(`${userApp.id}/posts/${Date.now()}-${file.name}`)
       await storageRef.put(file);
       let url = await storageRef.getDownloadURL();
-      const post = new Post(userApp.id, userApp.userName,inputPostDescription.value, url);
+      const post = new Post(userApp.id, userApp.userName, inputPostDescription.value, url);
       await firestore.collection(POSTS).add({ ...post });
       userApp.post += 1;
       await firestore.collection(USERS).doc(userApp.id)
-      .update({post: userApp.post});
+        .update({ post: userApp.post });
     } catch (error) {
       console.log(error);
     }
@@ -184,11 +204,11 @@ btnCreatePost.onclick = async () => {
 }
 
 const showPost = (post) => {
-  const postCommentAmount =  document.querySelector('#postCommentAmount');
-  let liked = post.likesRef.includes(userApp.id) ? true: false;
-  const likeIcon = liked?
-        './assets/img/icon-heart-red.png'
-        : './assets/img/icon-heart-outline.png';
+  const postCommentAmount = document.querySelector('#postCommentAmount');
+  let liked = post.likesRef.includes(userApp.id) ? true : false;
+  const likeIcon = liked ?
+    './assets/img/icon-heart-red.png'
+    : './assets/img/icon-heart-outline.png';
   postImg.src = post.imageUrl;
   postHeader.innerHTML = `
     <img
@@ -212,10 +232,10 @@ const showPost = (post) => {
   sentComment.onclick = () => addPostComment(post.id);
   modalPostLikeIcon.onclick = () => {
     liked = !liked;
-    const icon = liked?
-        './assets/img/icon-heart-red.png'
-        : './assets/img/icon-heart-outline.png';
-    post.likes = liked? post.likes + 1 : post.likes - 1;
+    const icon = liked ?
+      './assets/img/icon-heart-red.png'
+      : './assets/img/icon-heart-outline.png';
+    post.likes = liked ? post.likes + 1 : post.likes - 1;
     modalPostLikeIcon.innerHTML = `<img src="${icon}" alt="icono de favorito">`;
     modalPostLikes.innerText = post.likes;
     addPostLike(post.id);
