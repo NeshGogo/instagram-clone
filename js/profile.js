@@ -95,7 +95,24 @@ firestore.collection(POSTS)
             addPostTitle.innerText = 'Editar Publicacion';
             showAddPost();
           };
-          document.getElementById(`postDelete-${post.id}`).onclick = () => showPost(post);
+          document.getElementById(`postDelete-${post.id}`).onclick = async () => {
+            let agreed = await swal({
+              title: "Esta seguro?",
+              text: "Una vez eliminado, se perdera toda la informacion",
+              icon: "warning",
+              buttons: ['Cancelar',true],
+              dangerMode: true,
+            });
+            if(!agreed) return;
+            await deleteFile(post.imageStorageRef);
+            const comments = await firestore.collection(COMMENTS).where('postRef','==',post.id).get();
+            comments.forEach(docRef => {
+              firestore.collection(COMMENTS).doc(docRef.id).delete();
+            })
+            await firestore.collection(POSTS).doc(post.id).delete();
+            userApp.post = --userApp.post;
+            await firestore.collection(USERS).doc(currentUserId).update({...userApp});
+          };
         }, 0);
       }
     })
