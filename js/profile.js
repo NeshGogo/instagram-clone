@@ -8,6 +8,7 @@ const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
 let userApp;
+let currentUserId;
 
 // HtmlElements de la pagina principal
 const headerUserImage = document.querySelector('#headerUserImage');
@@ -19,6 +20,7 @@ const userFullname = document.querySelector('#userFullname');
 const postCount = document.querySelector('#postCount');
 const userBiography = document.querySelector('#userBiography');
 const btnAddPost = document.querySelector('#addPost');
+const infoDeleteUserPicture = document.querySelector('#infoDeleteUserPicture');
 
 // HtmlElements del modal de edicion de perfil
 const inputUserName = document.querySelector('#inputUserName');
@@ -45,7 +47,7 @@ const modalPostLikeIcon = document.querySelector('#modalPostLikeIcon');
 
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
-    userApp = { id: userAccount.uid }
+    currentUserId =  userAccount.uid;
     firestore.collection(USERS).doc(userAccount.uid)
       .onSnapshot(function (userRef) {
         userApp = { ...userApp, ...userRef.data() };
@@ -63,9 +65,9 @@ firestore.collection(POSTS)
     postList.innerHTML = '';
     querySnapShot.forEach(postDoc => {
       const post = { id: postDoc.id, ...postDoc.data() };
-      if (post.userRef === userApp.id) {
+      if (post.userRef === currentUserId) {
         postList.innerHTML += `
-          <div class="col-xs-12 
+          <div class="col-xs-12
             col-sm-8
             col-md-6
             col-lg-4">
@@ -117,12 +119,12 @@ const init = () => {
 const addPostLike = async (postId) => {
   const docRef = firestore.collection(POSTS).doc(postId);
   const post = (await docRef.get()).data();
-  const liked = !post.likesRef.includes(userApp.id);
+  const liked = !post.likesRef.includes(currentUserId);
   docRef.update({
     likes: liked ? post.likes + 1 : post.likes - 1,
     likesRef: liked ?
-      firebase.firestore.FieldValue.arrayUnion(userApp.id)
-      : firebase.firestore.FieldValue.arrayRemove(userApp.id),
+      firebase.firestore.FieldValue.arrayUnion(currentUserId)
+      : firebase.firestore.FieldValue.arrayRemove(currentUserId),
   })
 }
 btnEdit.onclick = () => {
@@ -138,6 +140,7 @@ btnEdit.onclick = () => {
 
 document.getElementById('close-edit').onclick = () => {
   const openEdit = document.getElementById('open-edit');
+  document.querySelector('#editUserForm').reset();
   setTimeout(() => {
     openEdit.style.opacity = '0';
     openEdit.style.pointerEvents = 'none';
@@ -149,10 +152,12 @@ btnUpdateUser.onclick = async () => {
   userApp.fullName = inputFullName.value;
   userApp.biography = inputBiography.value;
   const file = inputUserImageFile.files[0];
-  if (file)
-    userApp.imageUrl = await uploadFile(file)
-
-  await firestore.collection(USERS).doc(userApp.id).set({ ...userApp });
+  if (file){
+    const uploadRef = await uploadFile(file);
+    userApp.imageUrl = await uploadRef.getDownloadURL();
+    userApp.imageStorageRef = uploadRef.fullPath;
+  }
+  await firestore.collection(USERS).doc(currentUserId).update({ ...userApp });
   document.getElementById('close-edit').onclick();
 }
 
@@ -166,6 +171,22 @@ btnAddPost.onclick = () => {
     document.getElementById('close-addPost').onclick();
   }
 };
+
+infoDeleteUserPicture.onclick = async () =>{
+  if(userApp.imageStorageRef === '') return;
+  let agreed = await swal({
+    title: "Esta seguro?",
+    text: "Una vez eliminado, usted no podra ver esta imagen nuevamente!",
+    icon: "warning",
+    buttons: ['Cancelar',true],
+    dangerMode: true,
+  });
+  if(!agreed) return;
+  await deleteFile(userApp.imageStorageRef)
+  userApp.imageStorageRef = '';
+  userApp.imageUrl = '';
+  await firestore.collection(USERS).doc(currentUserId).update({ ...userApp });
+}
 
 const showAddPost = () => {
   const openEdit = document.getElementById('open-addPost');
@@ -184,15 +205,18 @@ document.getElementById('close-addPost').onclick = () => {
   }, 0);
 }
 
+
 const addPost = async () => {
   try {
     const file = inputPostFile.files[0];
     if (file === undefined) return;
-    const url = await uploadFile(file, 'posts')
-    const post = new Post(userApp.id, userApp.userName, inputPostDescription.value, url);
+    const uploadRef = await uploadFile(file, 'posts');
+    const url = await uploadRef.getDownloadURL();
+    const imageStorageRef = uploadRef.fullPath;
+    const post = new Post(currentUserId, userApp.userName, inputPostDescription.value, url, imageStorageRef);
     await firestore.collection(POSTS).add({ ...post });
     userApp.post += 1;
-    await firestore.collection(USERS).doc(userApp.id)
+    await firestore.collection(USERS).doc(currentUserId)
       .update({ post: userApp.post });
   } catch (error) {
     console.log(error);
@@ -210,16 +234,24 @@ const uploadFile = async (file, folder = '') => {
   let storageRef;
   if (file === undefined) return;
   if (folder === '') {
-    storageRef = storage.ref(`${userApp.id}/profile.${file.name.split('.')[1]}`)
+    storageRef = storage.ref(`${currentUserId}/profile.${file.name.split('.')[1]}`)
   } else {
-    storageRef = storage.ref(`${userApp.id}/${folder}/${Date.now()}-${file.name}`)
+    storageRef = storage.ref(`${currentUserId}/${folder}/${Date.now()}-${file.name}`)
   }
   await storageRef.put(file);
-  return await storageRef.getDownloadURL();
+  return  storageRef;
+}
+const deleteFile =  async (filestorageRef) => {
+  let fileRef = storage.ref().child(filestorageRef);
+  try {
+    await fileRef.delete();
+  } catch (error) {
+    console.log(error);
+  }
 }
 const showPost = (post) => {
   const postCommentAmount = document.querySelector('#postCommentAmount');
-  let liked = post.likesRef.includes(userApp.id) ? true : false;
+  let liked = post.likesRef.includes(currentUserId) ? true : false;
   const likeIcon = liked ?
     './assets/img/icon-heart-red.png'
     : './assets/img/icon-heart-outline.png';
@@ -310,7 +342,7 @@ const addPostComment = async (postId) => {
   const inputComment = document.querySelector('#inputComment');
   if (inputComment.value !== '') {
     try {
-      const comment = new Comment(userApp.id, userApp.userName, inputComment.value, postId)
+      const comment = new Comment(currentUserId, userApp.userName, inputComment.value, postId)
       const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
       await firestore.collection(POSTS).doc(postId).update({
         commentsRef: firebase.firestore.FieldValue.arrayUnion(commentRef.id)
