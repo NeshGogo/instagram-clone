@@ -86,8 +86,8 @@ firestore.collection(POSTS)
             inputPostDescription.value = post.description;
             inputPostFile.style.display = 'none';
             btnCreateAndEditPost.innerText = 'Actualizar';
-            btnCreateAndEditPost.onclick = ()=> {
-              updatePost(post.id);
+            btnCreateAndEditPost.onclick = async () => {
+              await updatePost(post.id);
               document.getElementById('close-addPost').onclick();
             }
             addPostTitle.innerText = 'Editar Publicacion';
@@ -103,7 +103,11 @@ const init = () => {
   if (userApp.imageUrl !== '') {
     headerUserImage.src = userApp.imageUrl;
     userImage.src = userApp.imageUrl;
+  }else{
+    headerUserImage.src = './assets/img/user-account.png';
+    userImage.src = './assets/img/user-account.png';
   }
+
   headerUserFullname.innerText = userApp.fullName;
   userName.innerText = userApp.userName;
   userFullname.innerText = userApp.fullName;
@@ -145,22 +149,10 @@ btnUpdateUser.onclick = async () => {
   userApp.fullName = inputFullName.value;
   userApp.biography = inputBiography.value;
   const file = inputUserImageFile.files[0];
-  if (file) {
-    const storageRef = storage.ref(`${userApp.id}/profile.${file.name.split('.')[1]}`)
-    storageRef.put(file);
-    if (userApp.imageUrl === '') {
-      storageRef.getDownloadURL().then(url => {
-        userApp.imageUrl = url;
-        firestore.collection(USERS).doc(userApp.id).set({ ...userApp }, { merge: true });
-      });
-    } else {
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    }
-  } else {
-    await firestore.collection(USERS).doc(userApp.id).set({ ...userApp });
-  }
+  if (file)
+    userApp.imageUrl = await uploadFile(file)
+
+  await firestore.collection(USERS).doc(userApp.id).set({ ...userApp });
   document.getElementById('close-edit').onclick();
 }
 
@@ -169,8 +161,8 @@ btnAddPost.onclick = () => {
   btnCreateAndEditPost.innerText = 'Agregar';
   addPostTitle.innerText = 'Agregar Publicacion';
   showAddPost();
-  btnCreateAndEditPost.onclick = () => {
-    addPost();
+  btnCreateAndEditPost.onclick = async () => {
+    await addPost();
     document.getElementById('close-addPost').onclick();
   }
 };
@@ -195,20 +187,18 @@ document.getElementById('close-addPost').onclick = () => {
 const addPost = async () => {
   try {
     const file = inputPostFile.files[0];
-    if (file) {
-      const url = await uploadFile(file, 'posts')
-      const post = new Post(userApp.id, userApp.userName, inputPostDescription.value, url);
-      await firestore.collection(POSTS).add({ ...post });
-      userApp.post += 1;
-      await firestore.collection(USERS).doc(userApp.id)
-        .update({ post: userApp.post });
-    }
+    if (file === undefined) return;
+    const url = await uploadFile(file, 'posts')
+    const post = new Post(userApp.id, userApp.userName, inputPostDescription.value, url);
+    await firestore.collection(POSTS).add({ ...post });
+    userApp.post += 1;
+    await firestore.collection(USERS).doc(userApp.id)
+      .update({ post: userApp.post });
   } catch (error) {
     console.log(error);
   }
 }
 const updatePost = async (postId) => {
-  debugger;
   try {
     await firestore.collection(POSTS)
       .doc(postId).update({ description: inputPostDescription.value });
@@ -218,7 +208,7 @@ const updatePost = async (postId) => {
 }
 const uploadFile = async (file, folder = '') => {
   let storageRef;
-  if (file === undefined || file !== File) return;
+  if (file === undefined) return;
   if (folder === '') {
     storageRef = storage.ref(`${userApp.id}/profile.${file.name.split('.')[1]}`)
   } else {

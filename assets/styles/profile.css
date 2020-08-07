@@ -102,6 +102,7 @@
   border-radius: 5px;
   margin-bottom: 25px;
   border: 1px solid lightgray;
+  cursor: pointer;
 }
 
 .post__options{
