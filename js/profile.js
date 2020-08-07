@@ -28,7 +28,7 @@ const inputUserImageFile = document.querySelector('#inputUserImageFile');
 const btnUpdateUser = document.querySelector('#btnUpdateUser');
 
 // HtmlElements del modal de agregar post
-const btnCreatePost = document.querySelector('#btnCreatePost');
+const btnCreateAndEditPost = document.querySelector('#btnCreateAndEditPost');
 const inputPostFile = document.querySelector('#inputPostFile');
 const inputPostDescription = document.querySelector('#inputPostDescription');
 const addPostTitle = document.querySelector('#addPostTitle');
@@ -85,7 +85,11 @@ firestore.collection(POSTS)
           document.getElementById(`postEdit-${post.id}`).onclick = () => {
             inputPostDescription.value = post.description;
             inputPostFile.style.display = 'none';
-            btnCreatePost.innerText = 'Actualizar';
+            btnCreateAndEditPost.innerText = 'Actualizar';
+            btnCreateAndEditPost.onclick = ()=> {
+              updatePost(post.id);
+              document.getElementById('close-addPost').onclick();
+            }
             addPostTitle.innerText = 'Editar Publicacion';
             showAddPost();
           };
@@ -162,9 +166,13 @@ btnUpdateUser.onclick = async () => {
 
 btnAddPost.onclick = () => {
   inputPostFile.style.display = 'initial';
-  btnCreatePost.innerText = 'Agregar';
+  btnCreateAndEditPost.innerText = 'Agregar';
   addPostTitle.innerText = 'Agregar Publicacion';
-  showAddPost()
+  showAddPost();
+  btnCreateAndEditPost.onclick = () => {
+    addPost();
+    document.getElementById('close-addPost').onclick();
+  }
 };
 
 const showAddPost = () => {
@@ -184,25 +192,41 @@ document.getElementById('close-addPost').onclick = () => {
   }, 0);
 }
 
-btnCreatePost.onclick = async () => {
-  const file = inputPostFile.files[0];
-  if (file) {
-    try {
-      const storageRef = storage.ref(`${userApp.id}/posts/${Date.now()}-${file.name}`)
-      await storageRef.put(file);
-      let url = await storageRef.getDownloadURL();
+const addPost = async () => {
+  try {
+    const file = inputPostFile.files[0];
+    if (file) {
+      const url = await uploadFile(file, 'posts')
       const post = new Post(userApp.id, userApp.userName, inputPostDescription.value, url);
       await firestore.collection(POSTS).add({ ...post });
       userApp.post += 1;
       await firestore.collection(USERS).doc(userApp.id)
         .update({ post: userApp.post });
-    } catch (error) {
-      console.log(error);
     }
+  } catch (error) {
+    console.log(error);
   }
-  document.getElementById('close-addPost').onclick();
 }
-
+const updatePost = async (postId) => {
+  debugger;
+  try {
+    await firestore.collection(POSTS)
+      .doc(postId).update({ description: inputPostDescription.value });
+  } catch (error) {
+    console.log(error);
+  }
+}
+const uploadFile = async (file, folder = '') => {
+  let storageRef;
+  if (file === undefined || file !== File) return;
+  if (folder === '') {
+    storageRef = storage.ref(`${userApp.id}/profile.${file.name.split('.')[1]}`)
+  } else {
+    storageRef = storage.ref(`${userApp.id}/${folder}/${Date.now()}-${file.name}`)
+  }
+  await storageRef.put(file);
+  return await storageRef.getDownloadURL();
+}
 const showPost = (post) => {
   const postCommentAmount = document.querySelector('#postCommentAmount');
   let liked = post.likesRef.includes(userApp.id) ? true : false;
