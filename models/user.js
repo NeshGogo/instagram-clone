@@ -4,7 +4,7 @@ export  class User {
     email,
     userName,
     fullName,
-    imageUrl = '',
+    imageUrl = './assets/img/user-account.png',
     imageStorageRef = '',
     biography = '',
     post = 0) {

@@ -50,6 +50,7 @@
 .post-card--footer-img a > img{
   width: 30px;
   margin-right: 10px;
+  cursor: pointer;
 }
 .post-card--footer-img > p{
   margin-top: 2px;
@@ -58,7 +59,7 @@
   color: goldenrod;
 }
 .post-card--description{
-  margin-left: 10px;
+  margin: 0 10px;
 }
 
 .post-card--description h4{
@@ -76,7 +77,7 @@
 }
 
 .post-card--comments{
-  margin-left: 10px;
+  margin: 0 10px;
 }
 .post-card--comments h4{
   margin-bottom: 0;

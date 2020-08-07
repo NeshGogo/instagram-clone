@@ -1,5 +1,4 @@
-import { firestore, auth, storage } from '../services/firebase.js';
-import firebase from '../services/firebase.js';
+import { firestore, auth, storage, fieldValue } from '../services/firebase.js';
 import { Post } from '../models/post.js';
 import { Comment } from '../models/comment.js';
 
@@ -47,7 +46,7 @@ const modalPostLikeIcon = document.querySelector('#modalPostLikeIcon');
 
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
-    currentUserId =  userAccount.uid;
+    currentUserId = userAccount.uid;
     firestore.collection(USERS).doc(userAccount.uid)
       .onSnapshot(function (userRef) {
         userApp = { ...userApp, ...userRef.data() };
@@ -100,18 +99,18 @@ firestore.collection(POSTS)
               title: "Esta seguro?",
               text: "Una vez eliminado, se perdera toda la informacion",
               icon: "warning",
-              buttons: ['Cancelar',true],
+              buttons: ['Cancelar', true],
               dangerMode: true,
             });
-            if(!agreed) return;
+            if (!agreed) return;
             await deleteFile(post.imageStorageRef);
-            const comments = await firestore.collection(COMMENTS).where('postRef','==',post.id).get();
+            const comments = await firestore.collection(COMMENTS).where('postRef', '==', post.id).get();
             comments.forEach(docRef => {
               firestore.collection(COMMENTS).doc(docRef.id).delete();
             })
             await firestore.collection(POSTS).doc(post.id).delete();
             userApp.post = --userApp.post;
-            await firestore.collection(USERS).doc(currentUserId).update({...userApp});
+            await firestore.collection(USERS).doc(currentUserId).update({ ...userApp });
           };
         }, 0);
       }
@@ -119,14 +118,8 @@ firestore.collection(POSTS)
   });
 
 const init = () => {
-  if (userApp.imageUrl !== '') {
-    headerUserImage.src = userApp.imageUrl;
-    userImage.src = userApp.imageUrl;
-  }else{
-    headerUserImage.src = './assets/img/user-account.png';
-    userImage.src = './assets/img/user-account.png';
-  }
-
+  headerUserImage.src = userApp.imageUrl;
+  userImage.src = userApp.imageUrl;
   headerUserFullname.innerText = userApp.fullName;
   userName.innerText = userApp.userName;
   userFullname.innerText = userApp.fullName;
@@ -140,8 +133,8 @@ const addPostLike = async (postId) => {
   docRef.update({
     likes: liked ? post.likes + 1 : post.likes - 1,
     likesRef: liked ?
-      firebase.firestore.FieldValue.arrayUnion(currentUserId)
-      : firebase.firestore.FieldValue.arrayRemove(currentUserId),
+      fieldValue.arrayUnion(currentUserId)
+      : fieldValue.arrayRemove(currentUserId),
   })
 }
 btnEdit.onclick = () => {
@@ -169,7 +162,7 @@ btnUpdateUser.onclick = async () => {
   userApp.fullName = inputFullName.value;
   userApp.biography = inputBiography.value;
   const file = inputUserImageFile.files[0];
-  if (file){
+  if (file) {
     const uploadRef = await uploadFile(file);
     userApp.imageUrl = await uploadRef.getDownloadURL();
     userApp.imageStorageRef = uploadRef.fullPath;
@@ -189,19 +182,23 @@ btnAddPost.onclick = () => {
   }
 };
 
-infoDeleteUserPicture.onclick = async () =>{
-  if(userApp.imageStorageRef === '') return;
+infoDeleteUserPicture.onclick = async () => {
+  debugger;
+  if (userApp.imageUrl === './assets/img/user-account.png'){
+    swal('Alerta!', 'Debes subir una fotografia para poder eliminarla.','warning');
+    return;
+  }
   let agreed = await swal({
     title: "Esta seguro?",
     text: "Una vez eliminado, usted no podra ver esta imagen nuevamente!",
     icon: "warning",
-    buttons: ['Cancelar',true],
+    buttons: ['Cancelar', true],
     dangerMode: true,
   });
-  if(!agreed) return;
+  if (!agreed) return;
   await deleteFile(userApp.imageStorageRef)
   userApp.imageStorageRef = '';
-  userApp.imageUrl = '';
+  userApp.imageUrl = './assets/img/user-account.png';
   await firestore.collection(USERS).doc(currentUserId).update({ ...userApp });
 }
 
@@ -256,9 +253,9 @@ const uploadFile = async (file, folder = '') => {
     storageRef = storage.ref(`${currentUserId}/${folder}/${Date.now()}-${file.name}`)
   }
   await storageRef.put(file);
-  return  storageRef;
+  return storageRef;
 }
-const deleteFile =  async (filestorageRef) => {
+const deleteFile = async (filestorageRef) => {
   let fileRef = storage.ref().child(filestorageRef);
   try {
     await fileRef.delete();
@@ -362,7 +359,7 @@ const addPostComment = async (postId) => {
       const comment = new Comment(currentUserId, userApp.userName, inputComment.value, postId)
       const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
       await firestore.collection(POSTS).doc(postId).update({
-        commentsRef: firebase.firestore.FieldValue.arrayUnion(commentRef.id)
+        commentsRef: fieldValue.arrayUnion(commentRef.id)
       });
       inputComment.value = '';
     } catch (error) {
