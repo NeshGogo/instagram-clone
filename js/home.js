@@ -1,6 +1,5 @@
 import { Comment } from '../models/comment.js'
-import { auth, firestore } from '../services/firebase.js';
-import firebase from '../services/firebase.js';
+import { auth, firestore, fieldValue } from '../services/firebase.js';
 
 const USERS = 'users';
 const POSTS = 'posts';
@@ -119,7 +118,7 @@ const addPostComment = async (postId, value) => {
       const comment = new Comment(currentUser.id, currentUser.userName, value, postId)
       const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
       await firestore.collection(POSTS).doc(postId).update({
-        commentsRef: firebase.firestore.FieldValue.arrayUnion(commentRef.id)
+        commentsRef: fieldValue.arrayUnion(commentRef.id)
       });
     } catch (error) {
       console.log(error);
@@ -133,8 +132,8 @@ const addPostLike = async (postId) => {
   docRef.update({
     likes: liked ? post.likes + 1 : post.likes - 1,
     likesRef: liked ?
-      firebase.firestore.FieldValue.arrayUnion(currentUser.id)
-      : firebase.firestore.FieldValue.arrayRemove(currentUser.id),
+      fieldValue.arrayUnion(currentUser.id)
+      : fieldValue.arrayRemove(currentUser.id),
   })
 }
 const ActiveOnChangePost = (postId, user) => {

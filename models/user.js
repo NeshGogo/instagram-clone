@@ -4,7 +4,8 @@ export  class User {
     email,
     userName,
     fullName,
-    imageUrl = '',
+    imageUrl = './assets/img/user-account.png',
+    imageStorageRef = '',
     biography = '',
     post = 0) {
     this.email = email;
@@ -13,5 +14,6 @@ export  class User {
     this.imageUrl = imageUrl;
     this.biography = biography;
     this.post = post;
+    this.imageStorageRef = imageStorageRef;
   }
 }
