@@ -4,6 +4,7 @@ import { auth, firestore, fieldValue } from '../services/firebase.js';
 const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
+const errorLog = [];
 let currentUser = {};
 
 // HtmlElements del header.
@@ -70,6 +71,48 @@ firestore.collection(POSTS).orderBy('date', 'desc').get().then(async (snapshots)
     initPost(post);
   })
 })
+
+document.querySelector('#changePassword')
+  .onclick = () => openModal('open-changePassword');
+
+document.querySelector('#close-changePassword')
+  .onclick = () => closeModal('open-changePassword', 'formChangePassword');
+
+document.querySelector('#btnChangePassword').onclick = () => {
+  const inputsId = [
+    'inputLastPassword',
+    'inputNewPassword',
+    'inputNewPasswordConfirm'
+  ];
+  const inputLastPassword = document.querySelector('#inputLastPassword');
+  const inputNewPassword = document.querySelector('#inputNewPassword');
+  const inputNewPasswordConfirm = document.querySelector('#inputNewPasswordConfirm');
+  validateInputsNotNull(inputsId);
+  validateCofirmPassword(inputNewPassword, inputNewPasswordConfirm);
+  if(errorLog.length > 0) {
+    showErrors();
+    return false;
+  }
+  changePassword(inputLastPassword.value, inputNewPassword.value);
+}
+
+document.getElementById('close-post').onclick = () => {
+  postImg.src = '';
+  postHeader.innerHTML = '';
+  postDescription.innerHTML = '';
+  postCommentList.innerHTML = '';
+  modalPostLikes.innerHTML = '';
+  modalPostLikeIcon.innerHTML = '';
+  // unsubscribe();
+  setTimeout(() => {
+    openPost.style.opacity = '0';
+    openPost.style.pointerEvents = 'none';
+  }, 0);
+}
+
+document.querySelector('#signOut').onclick = () => {
+  auth.signOut();
+}
 
 const initPost = async (post) => {
   getLastTwoPostCommets(post.id);
@@ -234,19 +277,83 @@ const appendPostComment = async (comment) => {
     `;
 }
 
-document.getElementById('close-post').onclick = () => {
-  postImg.src = '';
-  postHeader.innerHTML = '';
-  postDescription.innerHTML = '';
-  postCommentList.innerHTML = '';
-  modalPostLikes.innerHTML = '';
-  modalPostLikeIcon.innerHTML = '';
-  // unsubscribe();
+const openModal = (tagId) => {
+  const modal = document.getElementById(tagId);
   setTimeout(() => {
-    openPost.style.opacity = '0';
-    openPost.style.pointerEvents = 'none';
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
   }, 0);
 }
-document.querySelector('#signOut').onclick = () => {
-  auth.signOut();
+
+const closeModal = (tagId, tagFormId = '') => {
+  const modal = document.getElementById(tagId);
+  if (tagFormId !== '')
+    document.getElementById(tagFormId).reset();
+
+  setTimeout(() => {
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+  }, 0);
+}
+const changePassword = (lastPassword, newPassword) => {
+  const user = auth.currentUser;
+  auth.signInWithEmailAndPassword(user.email, lastPassword)
+    .then(() => {
+      user.updatePassword(newPassword)
+        .then(() => {
+          swal('Excelente!!','La contraseña fue cambiada satisfactoriamente','success');
+          closeModal('open-changePassword', 'formChangePassword');
+        })
+        .catch(error => {
+          if(error.code === 'auth/weak-password') {
+            swal(
+              'Contraseña debil!',
+              'La contraseña debe tener almenos 6 caracteres.',
+              'warning'
+            );
+          }
+        });
+    })
+    .catch(() => swal('Invalido!','La contraseña actual es incorrecta','error'));
+}
+const validateInputsNotNull = (inputsId) => {
+  inputsId.forEach( inputId => {
+    const input = document.getElementById(inputId);
+    if (input.value === '') {
+      const error = {
+        id: inputId + 'Error',
+        message: '* Este campo es requerido.'
+      };
+      addError(error);
+    }
+  });
+}
+
+const validateCofirmPassword = (inputNewPassword, inputConfirmPassword) => {
+  if (inputNewPassword.value !== inputConfirmPassword.value) {
+    const error = {
+      id: inputConfirmPassword.id + 'Error',
+      message: '* La contraseña no coincide.'
+    };
+    addError(error);
+  }
+}
+
+const addError = (error) => {
+  const verified = !errorLog
+      .some((er) => er.message === error.message && er.id === error.id);
+    if (verified) errorLog.push(error);
+}
+
+const showErrors = () => {
+  errorLog.forEach( error =>
+    document.getElementById(error.id).innerHTML = ''
+  );
+  errorLog.forEach((error) => {
+    const element = document.getElementById(error.id);
+    element.innerHTML += `
+      <p>${error.message}</p>
+    `;
+  });
+  errorLog.length = 0;
 }

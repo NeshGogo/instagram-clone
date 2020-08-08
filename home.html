@@ -40,7 +40,7 @@
         </div>
         <ul>
           <li><a href="./profile.html">Perfil</a></li>
-          <li><a href="./profile.html">Cambiar contraseña</a></li>
+          <li><a id="changePassword">Cambiar contraseña</a></li>
           <li><a id="signOut">Cerrar sesion</a></li>
         </ul>
       </div>
@@ -48,8 +48,9 @@
   </header>
   <main class="main">
     <section id="homePosts" class="post-list">
-      
+
     </section>
+
     <section id="open-post" class="modal">
       <div class="modal-content modal-post">
         <figure>
@@ -82,11 +83,34 @@
         </div>
       </div>
     </section>
+
+    <section id="open-changePassword" class="modal">
+      <div class="modal-content">
+        <span id="close-changePassword" class="modal-close">&times;</span>
+        <h3 class="modal-content--title">Cambiar contraseña</h3>
+        <form id="formChangePassword">
+          <div class="container__form__input">
+            <input class="form__input" id="inputLastPassword"  placeholder="Contraseña actual" type="password">
+            <span id="inputLastPasswordError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input class="form__input" id="inputNewPassword"  placeholder="Nueva contraseña" type="password">
+            <span id="inputNewPasswordError" class="form__error"></span>
+          </div>
+          <div class="container__form__input">
+            <input class="form__input" id="inputNewPasswordConfirm"  placeholder="Confirmar contraseña" type="password">
+            <span id="inputNewPasswordConfirmError" class="form__error"></span>
+          </div>
+          <button id="btnChangePassword" class="form__btn" type="button">Cambiar</button>
+        </form>
+      </div>
+    </section>
   </main>
   
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script type="module" src="js/home.js"></script>
 </body>
 

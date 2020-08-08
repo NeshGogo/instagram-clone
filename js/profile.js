@@ -6,6 +6,7 @@ import { Comment } from '../models/comment.js';
 const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
+const errorLog = [];
 let userApp;
 let currentUserId;
 
@@ -184,8 +185,8 @@ btnAddPost.onclick = () => {
 
 infoDeleteUserPicture.onclick = async () => {
   debugger;
-  if (userApp.imageUrl === './assets/img/user-account.png'){
-    swal('Alerta!', 'Debes subir una fotografia para poder eliminarla.','warning');
+  if (userApp.imageUrl === './assets/img/user-account.png') {
+    swal('Alerta!', 'Debes subir una fotografia para poder eliminarla.', 'warning');
     return;
   }
   let agreed = await swal({
@@ -321,6 +322,29 @@ document.getElementById('close-post').onclick = () => {
   }, 0);
 }
 
+document.querySelector('#changePassword')
+  .onclick = () => openModal('open-changePassword');
+
+document.querySelector('#close-changePassword')
+  .onclick = () => closeModal('open-changePassword', 'formChangePassword');
+
+document.querySelector('#btnChangePassword').onclick = () => {
+  const inputsId = [
+    'inputLastPassword',
+    'inputNewPassword',
+    'inputNewPasswordConfirm'
+  ];
+  const inputLastPassword = document.querySelector('#inputLastPassword');
+  const inputNewPassword = document.querySelector('#inputNewPassword');
+  const inputNewPasswordConfirm = document.querySelector('#inputNewPasswordConfirm');
+  validateInputsNotNull(inputsId);
+  validateCofirmPassword(inputNewPassword, inputNewPasswordConfirm);
+  if(errorLog.length > 0) {
+    showErrors();
+    return false;
+  }
+  changePassword(inputLastPassword.value, inputNewPassword.value);
+}
 
 const getPostComments = (postId) => {
   firestore.collection(COMMENTS)
@@ -334,11 +358,11 @@ const getPostComments = (postId) => {
     });
 
 }
+
 const appendComment = (comment) => {
   firestore.collection(USERS).doc(comment.userRef).get().then(userRef => {
     const user = userRef.data();
     const date = new Date(comment.date.seconds * 1000);
-    console.log(date.toLocaleTimeString())
     postCommentList.innerHTML += `
       <div>
         <img
@@ -347,11 +371,12 @@ const appendComment = (comment) => {
         alt="Imagen del usuario">
         <p><strong>${user.userName}</strong> ${comment.description}</p>
       </div>
-      <small><i>${date.toLocaleString()}</i></small> 
+      <small><i>${date.toLocaleString()}</i></small>
       <br><br>
     `;
   });
 }
+
 const addPostComment = async (postId) => {
   const inputComment = document.querySelector('#inputComment');
   if (inputComment.value !== '') {
@@ -368,6 +393,85 @@ const addPostComment = async (postId) => {
   }
 }
 
+const openModal = (tagId) => {
+  const modal = document.getElementById(tagId);
+  setTimeout(() => {
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+  }, 0);
+}
+
+const closeModal = (tagId, tagFormId = '') => {
+  const modal = document.getElementById(tagId);
+  if (tagFormId !== '')
+    document.getElementById(tagFormId).reset();
+
+  setTimeout(() => {
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+  }, 0);
+}
+const changePassword = (lastPassword, newPassword) => {
+  const user = auth.currentUser;
+  auth.signInWithEmailAndPassword(user.email, lastPassword)
+    .then(() => {
+      user.updatePassword(newPassword)
+        .then(() => {
+          swal('Excelente!!','La contraseña fue cambiada satisfactoriamente','success');
+          closeModal('open-changePassword', 'formChangePassword');
+        })
+        .catch(error => {
+          if(error.code === 'auth/weak-password') {
+            swal(
+              'Contraseña debil!',
+              'La contraseña debe tener almenos 6 caracteres.',
+              'warning'
+            );
+          }
+        });
+    })
+    .catch(() => swal('Invalido!','La contraseña actual es incorrecta','error'));
+}
+const validateInputsNotNull = (inputsId) => {
+  inputsId.forEach( inputId => {
+    const input = document.getElementById(inputId);
+    if (input.value === '') {
+      const error = {
+        id: inputId + 'Error',
+        message: '* Este campo es requerido.'
+      };
+      addError(error);
+    }
+  });
+}
+
+const validateCofirmPassword = (inputNewPassword, inputConfirmPassword) => {
+  if (inputNewPassword.value !== inputConfirmPassword.value) {
+    const error = {
+      id: inputConfirmPassword.id + 'Error',
+      message: '* La contraseña no coincide.'
+    };
+    addError(error);
+  }
+}
+const addError = (error) => {
+  const verified = !errorLog
+      .some((er) => er.message === error.message && er.id === error.id);
+    if (verified) errorLog.push(error);
+}
+
+const showErrors = () => {
+  errorLog.forEach( error =>
+    document.getElementById(error.id).innerHTML = ''
+  );
+  errorLog.forEach((error) => {
+    const element = document.getElementById(error.id);
+    element.innerHTML += `
+      <p>${error.message}</p>
+    `;
+  });
+  errorLog.length = 0;
+}
 document.querySelector('#signOut').onclick = () => {
   auth.signOut();
 }
