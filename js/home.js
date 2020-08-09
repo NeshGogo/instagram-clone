@@ -357,3 +357,32 @@ const showErrors = () => {
   });
   errorLog.length = 0;
 }
+
+const onChangeSearcherInput = () => {
+  const inputSearch = document.querySelector('#headerSearchInput');
+  inputSearch.addEventListener('change', (event) => {
+    const value =  event.target.value;
+    console.log(value);
+    firestore.collection(USERS).orderBy('userName')
+      .startAt(value).endAt(value+'\uf8ff').limit(5)
+      .get().then(docsRef => {
+        const results = document.querySelector('#searcherResults');
+        results.innerHTML = '';
+        if(docsRef.size === 0) results.innerHTML = '<li>No hay resultados.</li>';
+        docsRef.forEach( docRef => {
+          const user = docRef.data();
+          results.innerHTML += `
+            <li>
+              <a>
+                <img src="${user.imageUrl}" alt="Imagen del usuario">
+                <span>${user.userName}</span>
+              </a>
+            </li>
+          `;
+        });
+      });
+    
+  })
+}
+
+onChangeSearcherInput();
