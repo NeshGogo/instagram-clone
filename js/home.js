@@ -30,6 +30,7 @@ auth.onAuthStateChanged(async (userAccount) => {
         headerUserFullname.innerText = currentUser.fullName;
         headerUserImage.src = currentUser.imageUrl;
       });
+    onChangeSearcherInput();
   } else {
     window.location.href = './index.html';
   }
@@ -89,7 +90,7 @@ document.querySelector('#btnChangePassword').onclick = () => {
   const inputNewPasswordConfirm = document.querySelector('#inputNewPasswordConfirm');
   validateInputsNotNull(inputsId);
   validateCofirmPassword(inputNewPassword, inputNewPasswordConfirm);
-  if(errorLog.length > 0) {
+  if (errorLog.length > 0) {
     showErrors();
     return false;
   }
@@ -201,10 +202,10 @@ const ActiveOnChangePost = (postId, user) => {
 
 const showPost = (post, postUser) => {
   const postCommentAmount = document.querySelector('#postCommentAmount');
-  let liked = post.likesRef.includes(currentUser.id) ? true: false;
-  const likeIcon = liked?
-        './assets/img/icon-heart-red.png'
-        : './assets/img/icon-heart-outline.png';
+  let liked = post.likesRef.includes(currentUser.id) ? true : false;
+  const likeIcon = liked ?
+    './assets/img/icon-heart-red.png'
+    : './assets/img/icon-heart-outline.png';
   postImg.src = post.imageUrl;
   postHeader.innerHTML = `
     <img
@@ -233,10 +234,10 @@ const showPost = (post, postUser) => {
   };
   modalPostLikeIcon.onclick = () => {
     liked = !liked;
-    const icon = liked?
-        './assets/img/icon-heart-red.png'
-        : './assets/img/icon-heart-outline.png';
-    post.likes = liked? post.likes + 1 : post.likes - 1;
+    const icon = liked ?
+      './assets/img/icon-heart-red.png'
+      : './assets/img/icon-heart-outline.png';
+    post.likes = liked ? post.likes + 1 : post.likes - 1;
     modalPostLikeIcon.innerHTML = `<img src="${icon}" alt="icono de favorito">`;
     modalPostLikes.innerText = post.likes;
     addPostLike(post.id);
@@ -301,11 +302,11 @@ const changePassword = (lastPassword, newPassword) => {
     .then(() => {
       user.updatePassword(newPassword)
         .then(() => {
-          swal('Excelente!!','La contraseña fue cambiada satisfactoriamente','success');
+          swal('Excelente!!', 'La contraseña fue cambiada satisfactoriamente', 'success');
           closeModal('open-changePassword', 'formChangePassword');
         })
         .catch(error => {
-          if(error.code === 'auth/weak-password') {
+          if (error.code === 'auth/weak-password') {
             swal(
               'Contraseña debil!',
               'La contraseña debe tener almenos 6 caracteres.',
@@ -314,10 +315,10 @@ const changePassword = (lastPassword, newPassword) => {
           }
         });
     })
-    .catch(() => swal('Invalido!','La contraseña actual es incorrecta','error'));
+    .catch(() => swal('Invalido!', 'La contraseña actual es incorrecta', 'error'));
 }
 const validateInputsNotNull = (inputsId) => {
-  inputsId.forEach( inputId => {
+  inputsId.forEach(inputId => {
     const input = document.getElementById(inputId);
     if (input.value === '') {
       const error = {
@@ -341,12 +342,12 @@ const validateCofirmPassword = (inputNewPassword, inputConfirmPassword) => {
 
 const addError = (error) => {
   const verified = !errorLog
-      .some((er) => er.message === error.message && er.id === error.id);
-    if (verified) errorLog.push(error);
+    .some((er) => er.message === error.message && er.id === error.id);
+  if (verified) errorLog.push(error);
 }
 
 const showErrors = () => {
-  errorLog.forEach( error =>
+  errorLog.forEach(error =>
     document.getElementById(error.id).innerHTML = ''
   );
   errorLog.forEach((error) => {
@@ -360,29 +361,51 @@ const showErrors = () => {
 
 const onChangeSearcherInput = () => {
   const inputSearch = document.querySelector('#headerSearchInput');
-  inputSearch.addEventListener('change', (event) => {
-    const value =  event.target.value;
-    console.log(value);
-    firestore.collection(USERS).orderBy('userName')
-      .startAt(value).endAt(value+'\uf8ff').limit(5)
-      .get().then(docsRef => {
-        const results = document.querySelector('#searcherResults');
-        results.innerHTML = '';
-        if(docsRef.size === 0) results.innerHTML = '<li>No hay resultados.</li>';
-        docsRef.forEach( docRef => {
-          const user = docRef.data();
-          results.innerHTML += `
-            <li>
-              <a>
-                <img src="${user.imageUrl}" alt="Imagen del usuario">
-                <span>${user.userName}</span>
-              </a>
-            </li>
-          `;
-        });
-      });
-    
+
+  inputSearch.addEventListener('change', async (event) => {
+    const value = event.target.value;
+    if (value) {
+      const users = await searchUserByUserNameCoincidences(value);
+      appendUserToSearchResult(users);
+    }else{
+      resetSearchResult();
+    }
+  });
+
+  inputSearch.addEventListener('focusout', (event) => {
+    setTimeout(() => {
+      inputSearch.value = '';
+      resetSearchResult()
+    }, 400);
   })
 }
 
-onChangeSearcherInput();
+const searchUserByUserNameCoincidences = async (value) => {
+  const users = [];
+  const userRefs = await firestore.collection(USERS).orderBy('userName')
+    .startAt(value).endAt(value + '\uf8ff').limit(5).get();
+  userRefs.forEach(userRef => {
+    users.push({ id: userRef.id, ...userRef.data() })
+  });
+  return users;
+}
+
+const appendUserToSearchResult = (users) => {
+  const results = document.querySelector('#searcherResults');
+  results.innerHTML = '';
+  if (users.length === 0) resetSearchResult();
+  users.forEach(user => {
+    results.innerHTML += `
+      <li>
+        <a href="./profile.html?id=${user.id}">
+          <img src="${user.imageUrl}" alt="Imagen del usuario">
+          <span>${user.userName}</span>
+        </a>
+      </li>
+    `;
+  })
+}
+const resetSearchResult = () => {
+  const results = document.querySelector('#searcherResults');
+  results.innerHTML = '<li>No hay resultados.</li>';
+}

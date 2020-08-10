@@ -141,6 +141,9 @@
   height: 20px;
   cursor: pointer;
 }
+.post__options--none{
+  display: none;
+}
 .post:hover > div{
   background-color: rgba(0, 0, 0, 0.3);
   opacity: 1;

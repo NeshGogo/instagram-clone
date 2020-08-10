@@ -7,6 +7,8 @@ const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
 const errorLog = [];
+let searchedUserId = '';
+let searchedUser;
 let userApp;
 let currentUserId;
 
@@ -21,6 +23,7 @@ const postCount = document.querySelector('#postCount');
 const userBiography = document.querySelector('#userBiography');
 const btnAddPost = document.querySelector('#addPost');
 const infoDeleteUserPicture = document.querySelector('#infoDeleteUserPicture');
+const postList = document.querySelector('#post__list');
 
 // HtmlElements del modal de edicion de perfil
 const inputUserName = document.querySelector('#inputUserName');
@@ -45,88 +48,134 @@ const sentComment = document.querySelector('#sentComment');
 const modalPostLikes = document.querySelector('#modalPostLikes');
 const modalPostLikeIcon = document.querySelector('#modalPostLikeIcon');
 
+
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
+    const searchParams = new URLSearchParams(window.location.search);
+    searchedUserId = searchParams.get('id');
     currentUserId = userAccount.uid;
-    firestore.collection(USERS).doc(userAccount.uid)
-      .onSnapshot(function (userRef) {
+    if(currentUserId === searchedUserId) searchedUserId = null;
+    firestore.collection(USERS).doc(currentUserId)
+      .onSnapshot((userRef) => {
         userApp = { ...userApp, ...userRef.data() };
         init();
       });
+    if (searchedUserId) {
+      firestore.collection(USERS).doc(searchedUserId)
+        .get().then(searchedUserRef => {
+          searchedUser = { ...searchedUserRef.data() };
+          init();
+        });
+    }
   } else {
     window.location.href = './index.html';
   }
 });
 
-firestore.collection(POSTS)
-  .orderBy('date', 'desc')
-  .onSnapshot(querySnapShot => {
-    const postList = document.querySelector('#post__list');
-    postList.innerHTML = '';
-    querySnapShot.forEach(postDoc => {
-      const post = { id: postDoc.id, ...postDoc.data() };
-      if (post.userRef === currentUserId) {
-        postList.innerHTML += `
-          <div class="col-xs-12
-            col-sm-8
-            col-md-6
-            col-lg-4">
-                <div class=" post box ">
-                  <a id="post-${post.id}">
-                    <img src="${post.imageUrl}" alt="Image de una plicacion" />
-                  </a>
-                  <div class="post__options">
-                    <a id="postEdit-${post.id}"><img src="./assets/img/icon-edit.svg"></a>
-                    <a  id="postDelete-${post.id}"><img src="./assets/img/icon-delete.svg"></a>
-                  </div>
-                </div>
-          </div>
-        `;
-        setTimeout(() => {
-          document.getElementById(`post-${post.id}`).onclick = () => showPost(post);
-          document.getElementById(`postEdit-${post.id}`).onclick = () => {
-            inputPostDescription.value = post.description;
-            inputPostFile.style.display = 'none';
-            btnCreateAndEditPost.innerText = 'Actualizar';
-            btnCreateAndEditPost.onclick = async () => {
-              await updatePost(post.id);
-              document.getElementById('close-addPost').onclick();
-            }
-            addPostTitle.innerText = 'Editar Publicacion';
-            showAddPost();
-          };
-          document.getElementById(`postDelete-${post.id}`).onclick = async () => {
-            let agreed = await swal({
-              title: "Esta seguro?",
-              text: "Una vez eliminado, se perdera toda la informacion",
-              icon: "warning",
-              buttons: ['Cancelar', true],
-              dangerMode: true,
-            });
-            if (!agreed) return;
-            await deleteFile(post.imageStorageRef);
-            const comments = await firestore.collection(COMMENTS).where('postRef', '==', post.id).get();
-            comments.forEach(docRef => {
-              firestore.collection(COMMENTS).doc(docRef.id).delete();
-            })
-            await firestore.collection(POSTS).doc(post.id).delete();
-            userApp.post = --userApp.post;
-            await firestore.collection(USERS).doc(currentUserId).update({ ...userApp });
-          };
-        }, 0);
-      }
-    })
-  });
 
 const init = () => {
   headerUserImage.src = userApp.imageUrl;
-  userImage.src = userApp.imageUrl;
+  userImage.src = searchedUser?.imageUrl || userApp.imageUrl;
   headerUserFullname.innerText = userApp.fullName;
-  userName.innerText = userApp.userName;
-  userFullname.innerText = userApp.fullName;
-  postCount.innerText = userApp.post;
-  userBiography.innerText = userApp.biography || '';
+  userName.innerText = searchedUser?.userName || userApp.userName;
+  userFullname.innerText = searchedUser?.fullName || userApp.fullName;
+  postCount.innerText = searchedUser ? searchedUser.post : userApp.post;
+  userBiography.innerText = searchedUser?.biography || userApp.biography;
+  if (searchedUserId) {
+    document.getElementById('btnEdit').style.display = 'none';
+    document.getElementById('infoDeleteUserPicture').style.display = 'none';
+    document.getElementById('addPost').style.display = 'none';
+  }
+  onChangeSearcherInput();
+  getPosts(searchedUserId || currentUserId);
 };
+
+const getPosts = (id) => {
+  firestore.collection(POSTS)
+    .where('userRef', '==', id)
+    .orderBy('date', 'desc')
+    .onSnapshot(querySnapShot => {
+      const postList = document.querySelector('#post__list');
+      postList.innerHTML = '';
+      querySnapShot.forEach(postDoc => {
+        const post = { id: postDoc.id, ...postDoc.data() };
+        appendPost(post);
+        setTimeout(() => {
+          initPost(post);
+          if (searchedUserId) {
+            const postOption = document.querySelector('.post__options');
+            if (postOption)
+              postOption.className = 'post__options--none'
+          }
+        }, 0);
+      });
+
+    });
+}
+
+const appendPost = (post) => {
+  postList.innerHTML += `
+    <div
+    class="
+    col-xs-12
+    col-sm-8
+    col-md-6
+    col-lg-4">
+      <div class=" post box ">
+        <a id="post-${post.id}">
+          <img src="${post.imageUrl}" alt="Image de una plicacion" />
+        </a>
+        <div class="post__options">
+          <a id="postEdit-${post.id}"><img src="./assets/img/icon-edit.svg"></a>
+          <a  id="postDelete-${post.id}"><img src="./assets/img/icon-delete.svg"></a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+const initPost = (post) => {
+  document.getElementById(`post-${post.id}`).onclick = () => showPost(post);
+  document.getElementById(`postEdit-${post.id}`).onclick = () => postEdit(post);
+  document.getElementById(`postDelete-${post.id}`).onclick = async () => deletePost(post)
+}
+
+const postEdit = (post) => {
+  inputPostDescription.value = post.description;
+  inputPostFile.style.display = 'none';
+  btnCreateAndEditPost.innerText = 'Actualizar';
+  btnCreateAndEditPost.onclick = async () => {
+    await updatePost(post.id);
+    document.getElementById('close-addPost').onclick();
+  }
+  addPostTitle.innerText = 'Editar Publicacion';
+  showAddPost();
+}
+
+const deletePost = async (post) => {
+  debugger;
+  let agreed = await swal({
+    title: "Esta seguro?",
+    text: "Una vez eliminado, se perdera toda la informacion",
+    icon: "warning",
+    buttons: ['Cancelar', true],
+    dangerMode: true,
+  });
+  if (!agreed) return;
+  await deleteFile(post.imageStorageRef);
+  await deleteCommentByPost(post.id)
+  await firestore.collection(POSTS).doc(post.id).delete();
+  userApp.post = userApp.post - 1;
+  await firestore.collection(USERS).doc(currentUserId).update({ ...userApp });
+}
+
+const deleteCommentByPost = async (postId) => {
+  const comments = await firestore.collection(COMMENTS).where('postRef', '==', postId).get();
+  comments.forEach(docRef => {
+    firestore.collection(COMMENTS).doc(docRef.id).delete();
+  })
+}
+
 const addPostLike = async (postId) => {
   const docRef = firestore.collection(POSTS).doc(postId);
   const post = (await docRef.get()).data();
@@ -274,23 +323,31 @@ const showPost = (post) => {
   postHeader.innerHTML = `
     <img
       class="modal-post__details--user-img"
-      src="${userApp.imageUrl}"
+      src="${searchedUser?.imageUrl || userApp.imageUrl}"
       alt="Imagen del usuario">
-    <p><b>${userApp.userName}</b></p>
+    <p><b>${searchedUser?.userName || userApp.userName}</b></p>
   `;
   postDescription.innerHTML = `
     <img
       class="modal-post__details--user-img"
-      src="${userApp.imageUrl}"
+      src="${searchedUser?.imageUrl || userApp.imageUrl}"
       alt="Imagen del usuario">
-    <p><strong>${userApp.userName}</strong> ${post.description}</p>
+    <p>
+      <strong>${searchedUser?.userName || userApp.userName}</strong> 
+      ${post.description}
+    </p>
   `;
   postCommentAmount.innerHTML = post.commentsRef.length
   modalPostLikeIcon.innerHTML = `<img src="${likeIcon}" alt="icono de favorito">`;
   modalPostLikes.innerText = post.likes;
 
   getPostComments(post.id);
-  sentComment.onclick = () => addPostComment(post.id);
+  sentComment.onclick = () => {
+    const input = document.querySelector('#inputComment');
+    addPostComment(post.id, input.value)
+    input.value = '';
+    getPostComments(post.id);
+  }
   modalPostLikeIcon.onclick = () => {
     liked = !liked;
     const icon = liked ?
@@ -339,7 +396,7 @@ document.querySelector('#btnChangePassword').onclick = () => {
   const inputNewPasswordConfirm = document.querySelector('#inputNewPasswordConfirm');
   validateInputsNotNull(inputsId);
   validateCofirmPassword(inputNewPassword, inputNewPasswordConfirm);
-  if(errorLog.length > 0) {
+  if (errorLog.length > 0) {
     showErrors();
     return false;
   }
@@ -377,20 +434,19 @@ const appendComment = (comment) => {
   });
 }
 
-const addPostComment = async (postId) => {
-  const inputComment = document.querySelector('#inputComment');
-  if (inputComment.value !== '') {
-    try {
-      const comment = new Comment(currentUserId, userApp.userName, inputComment.value, postId)
-      const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
-      await firestore.collection(POSTS).doc(postId).update({
-        commentsRef: fieldValue.arrayUnion(commentRef.id)
-      });
-      inputComment.value = '';
-    } catch (error) {
-      console.log(error);
-    }
+const addPostComment = async (postId, value) => {
+  if (value === '') return;
+  debugger;
+  try {
+    const comment = new Comment(currentUserId, userApp.userName, value, postId)
+    const commentRef = await firestore.collection(COMMENTS).add({ ...comment });
+    await firestore.collection(POSTS).doc(postId).update({
+      commentsRef: fieldValue.arrayUnion(commentRef.id)
+    });
+  } catch (error) {
+    console.log(error);
   }
+
 }
 
 const openModal = (tagId) => {
@@ -417,11 +473,11 @@ const changePassword = (lastPassword, newPassword) => {
     .then(() => {
       user.updatePassword(newPassword)
         .then(() => {
-          swal('Excelente!!','La contraseña fue cambiada satisfactoriamente','success');
+          swal('Excelente!!', 'La contraseña fue cambiada satisfactoriamente', 'success');
           closeModal('open-changePassword', 'formChangePassword');
         })
         .catch(error => {
-          if(error.code === 'auth/weak-password') {
+          if (error.code === 'auth/weak-password') {
             swal(
               'Contraseña debil!',
               'La contraseña debe tener almenos 6 caracteres.',
@@ -430,10 +486,10 @@ const changePassword = (lastPassword, newPassword) => {
           }
         });
     })
-    .catch(() => swal('Invalido!','La contraseña actual es incorrecta','error'));
+    .catch(() => swal('Invalido!', 'La contraseña actual es incorrecta', 'error'));
 }
 const validateInputsNotNull = (inputsId) => {
-  inputsId.forEach( inputId => {
+  inputsId.forEach(inputId => {
     const input = document.getElementById(inputId);
     if (input.value === '') {
       const error = {
@@ -456,12 +512,12 @@ const validateCofirmPassword = (inputNewPassword, inputConfirmPassword) => {
 }
 const addError = (error) => {
   const verified = !errorLog
-      .some((er) => er.message === error.message && er.id === error.id);
-    if (verified) errorLog.push(error);
+    .some((er) => er.message === error.message && er.id === error.id);
+  if (verified) errorLog.push(error);
 }
 
 const showErrors = () => {
-  errorLog.forEach( error =>
+  errorLog.forEach(error =>
     document.getElementById(error.id).innerHTML = ''
   );
   errorLog.forEach((error) => {
@@ -474,4 +530,54 @@ const showErrors = () => {
 }
 document.querySelector('#signOut').onclick = () => {
   auth.signOut();
+}
+const onChangeSearcherInput = () => {
+  const inputSearch = document.querySelector('#headerSearchInput');
+
+  inputSearch.addEventListener('change', async (event) => {
+    const value = event.target.value;
+    if (value) {
+      const users = await searchUserByUserNameCoincidences(value);
+      appendUserToSearchResult(users);
+    } else {
+      resetSearchResult();
+    }
+  });
+
+  inputSearch.addEventListener('focusout', (event) => {
+    setTimeout(() => {
+      inputSearch.value = '';
+      resetSearchResult()
+    }, 400);
+  })
+}
+
+const searchUserByUserNameCoincidences = async (value) => {
+  const users = [];
+  const userRefs = await firestore.collection(USERS).orderBy('userName')
+    .startAt(value).endAt(value + '\uf8ff').limit(5).get();
+  userRefs.forEach(userRef => {
+    users.push({ id: userRef.id, ...userRef.data() })
+  });
+  return users;
+}
+
+const appendUserToSearchResult = (users) => {
+  const results = document.querySelector('#searcherResults');
+  results.innerHTML = '';
+  if (users.length === 0) resetSearchResult();
+  users.forEach(user => {
+    results.innerHTML += `
+      <li>
+        <a href="./profile.html?id=${user.id}">
+          <img src="${user.imageUrl}" alt="Imagen del usuario">
+          <span>${user.userName}</span>
+        </a>
+      </li>
+    `;
+  })
+}
+const resetSearchResult = () => {
+  const results = document.querySelector('#searcherResults');
+  results.innerHTML = '<li>No hay resultados.</li>';
 }

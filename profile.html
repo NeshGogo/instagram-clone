@@ -12,11 +12,15 @@
   <body>
     <header class="header">
       <div class="header__hero">
-        <img src="./assets/img/logo.png" alt="Logo de instagram" />
+        <a href="./home.html">
+          <img src="./assets/img/logo.png" alt="Logo de instagram" />
+        </a>
       </div>
       <div class="header__search">
         <input class="form__input"  type="text"placeholder="¿Quien deseas buscar?" id="headerSearchInput" >
-        <a>Buscar</a>
+        <ul id="searcherResults" class="header__search--results">
+          <li>No hay resultados.</li>
+        </ul>
       </div>
       <div class="header__access">
         <a class="header__access--home" href="./home.html">
@@ -38,7 +42,7 @@
             <p id="headerUserFullname"></p>
           </div>
           <ul>
-            <li><a href="./profile.html">Perfil</a></li>
+            <li><a>Perfil</a></li>
             <li><a id="changePassword">Cambiar contraseña</a></li>
             <li><a id="signOut">Cerrar sesion</a></li>
           </ul>
