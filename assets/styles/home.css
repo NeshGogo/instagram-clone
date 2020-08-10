@@ -17,8 +17,10 @@
 }
 
 .post-card{
+  background-color: white;
   margin: 0 auto;
   width: 40%;
+  color:  #262626;;
   border: 1px solid lightgrey;
   border-radius: 3px;
   margin-bottom: 50px;
@@ -27,7 +29,7 @@
 .post-card--header{
   display: flex;
   align-items: center;
-  color: grey;
+  color:  #262626;;
   font-weight: bold;
   font-style: italic;
   border-bottom: 1px solid lightgrey;
@@ -65,7 +67,6 @@
 
 .post-card--description h4{
   margin-bottom: 0;
-  color: grey;
   font-weight: bold;
 }
 .post-card--description p{
@@ -73,7 +74,6 @@
   font-weight: 300;
 }
 .post-card--description strong{
-  color: grey;
   font-weight: 500;
 }
 
@@ -82,7 +82,6 @@
 }
 .post-card--comments h4{
   margin-bottom: 0;
-  color: grey;
   font-weight: bold;
 }
 .post-card--comments a{
@@ -101,7 +100,6 @@
   font-weight: 300;
 }
 .post-card--comments div > p > strong{
-  color: grey;
   font-weight: 500;
 }
 .post-card--add-comment{

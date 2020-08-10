@@ -1,4 +1,5 @@
 .info{
+  color:  #262626;;
   display: flex;
   align-items: center;
   margin: 95px 20% 20px 20%;
@@ -35,7 +36,6 @@
 .info__user-name p{
   margin: 0;
   margin-right: 30px;
-  color: grey;
   font-weight: 700;
   font-size: 35px;
 }
@@ -45,7 +45,6 @@
   border: 1px solid lightgray;
   border-radius: 5px;
   background-color: whitesmoke;
-  color: rgb(105, 105, 105);
   font-family: roboto;
   outline: none;
   cursor: pointer;
@@ -58,7 +57,6 @@
   box-shadow: 0px 0px 6px  rgb(59, 180, 255);
 }
 .info__posts{
-  color: grey;
   font-size: 14px;
   font-style: italic;
 }
@@ -68,11 +66,9 @@
   font-style: italic;
   font-weight: 700;
   font-size: 18px;
-  color: grey;
 }
 
 .info__biography{
-  color: grey;
   margin-top: 8px;
 }
 
@@ -85,7 +81,6 @@
   margin-bottom: 3%;
 }
 .posts__header h4{
-  color: grey;
   margin: 0;
   font-size: 20px;
   font-weight: 700;
@@ -98,7 +93,7 @@
   cursor: pointer;
   stroke:none;
   fill-rule:nonzero;
-  fill:rgb(40%,40%,40%);
+  fill: #262626;;
   fill-opacity:1;
 }
 .posts__header svg:hover {
@@ -145,6 +140,6 @@
   display: none;
 }
 .post:hover > div{
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.6);
   opacity: 1;
 }

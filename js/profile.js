@@ -314,6 +314,7 @@ const deleteFile = async (filestorageRef) => {
   }
 }
 const showPost = (post) => {
+  debugger;
   const postCommentAmount = document.querySelector('#postCommentAmount');
   let liked = post.likesRef.includes(currentUserId) ? true : false;
   const likeIcon = liked ?
@@ -343,6 +344,7 @@ const showPost = (post) => {
 
   getPostComments(post.id);
   sentComment.onclick = () => {
+    debugger;
     const input = document.querySelector('#inputComment');
     addPostComment(post.id, input.value)
     input.value = '';
@@ -407,10 +409,10 @@ const getPostComments = (postId) => {
   firestore.collection(COMMENTS)
     .where('postRef', '==', postId)
     .orderBy('date', 'desc')
-    .onSnapshot((querySnapshots) => {
+    .get().then( querySnapshots => {
       postCommentList.innerHTML = '';
-      querySnapshots.forEach(docRef => {
-        appendComment(docRef.data());
+      querySnapshots.forEach(commentRef => {
+        appendComment(commentRef.data());
       });
     });
 
@@ -534,7 +536,7 @@ document.querySelector('#signOut').onclick = () => {
 const onChangeSearcherInput = () => {
   const inputSearch = document.querySelector('#headerSearchInput');
 
-  inputSearch.addEventListener('change', async (event) => {
+  inputSearch.addEventListener('input', async (event) => {
     const value = event.target.value;
     if (value) {
       const users = await searchUserByUserNameCoincidences(value);

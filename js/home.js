@@ -362,7 +362,7 @@ const showErrors = () => {
 const onChangeSearcherInput = () => {
   const inputSearch = document.querySelector('#headerSearchInput');
 
-  inputSearch.addEventListener('change', async (event) => {
+  inputSearch.addEventListener('input', async (event) => {
     const value = event.target.value;
     if (value) {
       const users = await searchUserByUserNameCoincidences(value);
