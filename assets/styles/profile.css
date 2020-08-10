@@ -124,7 +124,7 @@
   position: absolute;
   background-color: rgba(0, 0, 0, 0.6);
   opacity: 0;
-  width: 100%;
+  width: 248px;
   height: 9%;
   top: 80%;
   left: 2px;
@@ -140,6 +140,9 @@
   border: none;
   height: 20px;
   cursor: pointer;
+}
+.post__options--none{
+  display: none;
 }
 .post:hover > div{
   background-color: rgba(0, 0, 0, 0.3);

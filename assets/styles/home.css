@@ -42,6 +42,7 @@
 }
 .post-card--img{
   width: 100%;
+  height: 38em;
   border-bottom: 1px solid lightgrey;
 }
 .post-card--footer-img {

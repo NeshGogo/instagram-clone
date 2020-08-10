@@ -4,6 +4,7 @@ import { auth, firestore, fieldValue } from '../services/firebase.js';
 const USERS = 'users';
 const POSTS = 'posts';
 const COMMENTS = 'comments';
+const errorLog = [];
 let currentUser = {};
 
 // HtmlElements del header.
@@ -29,6 +30,7 @@ auth.onAuthStateChanged(async (userAccount) => {
         headerUserFullname.innerText = currentUser.fullName;
         headerUserImage.src = currentUser.imageUrl;
       });
+    onChangeSearcherInput();
   } else {
     window.location.href = './index.html';
   }
@@ -70,6 +72,48 @@ firestore.collection(POSTS).orderBy('date', 'desc').get().then(async (snapshots)
     initPost(post);
   })
 })
+
+document.querySelector('#changePassword')
+  .onclick = () => openModal('open-changePassword');
+
+document.querySelector('#close-changePassword')
+  .onclick = () => closeModal('open-changePassword', 'formChangePassword');
+
+document.querySelector('#btnChangePassword').onclick = () => {
+  const inputsId = [
+    'inputLastPassword',
+    'inputNewPassword',
+    'inputNewPasswordConfirm'
+  ];
+  const inputLastPassword = document.querySelector('#inputLastPassword');
+  const inputNewPassword = document.querySelector('#inputNewPassword');
+  const inputNewPasswordConfirm = document.querySelector('#inputNewPasswordConfirm');
+  validateInputsNotNull(inputsId);
+  validateCofirmPassword(inputNewPassword, inputNewPasswordConfirm);
+  if (errorLog.length > 0) {
+    showErrors();
+    return false;
+  }
+  changePassword(inputLastPassword.value, inputNewPassword.value);
+}
+
+document.getElementById('close-post').onclick = () => {
+  postImg.src = '';
+  postHeader.innerHTML = '';
+  postDescription.innerHTML = '';
+  postCommentList.innerHTML = '';
+  modalPostLikes.innerHTML = '';
+  modalPostLikeIcon.innerHTML = '';
+  // unsubscribe();
+  setTimeout(() => {
+    openPost.style.opacity = '0';
+    openPost.style.pointerEvents = 'none';
+  }, 0);
+}
+
+document.querySelector('#signOut').onclick = () => {
+  auth.signOut();
+}
 
 const initPost = async (post) => {
   getLastTwoPostCommets(post.id);
@@ -158,10 +202,10 @@ const ActiveOnChangePost = (postId, user) => {
 
 const showPost = (post, postUser) => {
   const postCommentAmount = document.querySelector('#postCommentAmount');
-  let liked = post.likesRef.includes(currentUser.id) ? true: false;
-  const likeIcon = liked?
-        './assets/img/icon-heart-red.png'
-        : './assets/img/icon-heart-outline.png';
+  let liked = post.likesRef.includes(currentUser.id) ? true : false;
+  const likeIcon = liked ?
+    './assets/img/icon-heart-red.png'
+    : './assets/img/icon-heart-outline.png';
   postImg.src = post.imageUrl;
   postHeader.innerHTML = `
     <img
@@ -190,10 +234,10 @@ const showPost = (post, postUser) => {
   };
   modalPostLikeIcon.onclick = () => {
     liked = !liked;
-    const icon = liked?
-        './assets/img/icon-heart-red.png'
-        : './assets/img/icon-heart-outline.png';
-    post.likes = liked? post.likes + 1 : post.likes - 1;
+    const icon = liked ?
+      './assets/img/icon-heart-red.png'
+      : './assets/img/icon-heart-outline.png';
+    post.likes = liked ? post.likes + 1 : post.likes - 1;
     modalPostLikeIcon.innerHTML = `<img src="${icon}" alt="icono de favorito">`;
     modalPostLikes.innerText = post.likes;
     addPostLike(post.id);
@@ -234,19 +278,134 @@ const appendPostComment = async (comment) => {
     `;
 }
 
-document.getElementById('close-post').onclick = () => {
-  postImg.src = '';
-  postHeader.innerHTML = '';
-  postDescription.innerHTML = '';
-  postCommentList.innerHTML = '';
-  modalPostLikes.innerHTML = '';
-  modalPostLikeIcon.innerHTML = '';
-  // unsubscribe();
+const openModal = (tagId) => {
+  const modal = document.getElementById(tagId);
   setTimeout(() => {
-    openPost.style.opacity = '0';
-    openPost.style.pointerEvents = 'none';
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
   }, 0);
 }
-document.querySelector('#signOut').onclick = () => {
-  auth.signOut();
+
+const closeModal = (tagId, tagFormId = '') => {
+  const modal = document.getElementById(tagId);
+  if (tagFormId !== '')
+    document.getElementById(tagFormId).reset();
+
+  setTimeout(() => {
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+  }, 0);
+}
+const changePassword = (lastPassword, newPassword) => {
+  const user = auth.currentUser;
+  auth.signInWithEmailAndPassword(user.email, lastPassword)
+    .then(() => {
+      user.updatePassword(newPassword)
+        .then(() => {
+          swal('Excelente!!', 'La contraseña fue cambiada satisfactoriamente', 'success');
+          closeModal('open-changePassword', 'formChangePassword');
+        })
+        .catch(error => {
+          if (error.code === 'auth/weak-password') {
+            swal(
+              'Contraseña debil!',
+              'La contraseña debe tener almenos 6 caracteres.',
+              'warning'
+            );
+          }
+        });
+    })
+    .catch(() => swal('Invalido!', 'La contraseña actual es incorrecta', 'error'));
+}
+const validateInputsNotNull = (inputsId) => {
+  inputsId.forEach(inputId => {
+    const input = document.getElementById(inputId);
+    if (input.value === '') {
+      const error = {
+        id: inputId + 'Error',
+        message: '* Este campo es requerido.'
+      };
+      addError(error);
+    }
+  });
+}
+
+const validateCofirmPassword = (inputNewPassword, inputConfirmPassword) => {
+  if (inputNewPassword.value !== inputConfirmPassword.value) {
+    const error = {
+      id: inputConfirmPassword.id + 'Error',
+      message: '* La contraseña no coincide.'
+    };
+    addError(error);
+  }
+}
+
+const addError = (error) => {
+  const verified = !errorLog
+    .some((er) => er.message === error.message && er.id === error.id);
+  if (verified) errorLog.push(error);
+}
+
+const showErrors = () => {
+  errorLog.forEach(error =>
+    document.getElementById(error.id).innerHTML = ''
+  );
+  errorLog.forEach((error) => {
+    const element = document.getElementById(error.id);
+    element.innerHTML += `
+      <p>${error.message}</p>
+    `;
+  });
+  errorLog.length = 0;
+}
+
+const onChangeSearcherInput = () => {
+  const inputSearch = document.querySelector('#headerSearchInput');
+
+  inputSearch.addEventListener('change', async (event) => {
+    const value = event.target.value;
+    if (value) {
+      const users = await searchUserByUserNameCoincidences(value);
+      appendUserToSearchResult(users);
+    }else{
+      resetSearchResult();
+    }
+  });
+
+  inputSearch.addEventListener('focusout', (event) => {
+    setTimeout(() => {
+      inputSearch.value = '';
+      resetSearchResult()
+    }, 400);
+  })
+}
+
+const searchUserByUserNameCoincidences = async (value) => {
+  const users = [];
+  const userRefs = await firestore.collection(USERS).orderBy('userName')
+    .startAt(value).endAt(value + '\uf8ff').limit(5).get();
+  userRefs.forEach(userRef => {
+    users.push({ id: userRef.id, ...userRef.data() })
+  });
+  return users;
+}
+
+const appendUserToSearchResult = (users) => {
+  const results = document.querySelector('#searcherResults');
+  results.innerHTML = '';
+  if (users.length === 0) resetSearchResult();
+  users.forEach(user => {
+    results.innerHTML += `
+      <li>
+        <a href="./profile.html?id=${user.id}">
+          <img src="${user.imageUrl}" alt="Imagen del usuario">
+          <span>${user.userName}</span>
+        </a>
+      </li>
+    `;
+  })
+}
+const resetSearchResult = () => {
+  const results = document.querySelector('#searcherResults');
+  results.innerHTML = '<li>No hay resultados.</li>';
 }
