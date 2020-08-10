@@ -115,12 +115,7 @@ const getPosts = (id) => {
 
 const appendPost = (post) => {
   postList.innerHTML += `
-    <div
-    class="
-    col-xs-12
-    col-sm-8
-    col-md-6
-    col-lg-4">
+    <div>
       <div class=" post box ">
         <a id="post-${post.id}">
           <img src="${post.imageUrl}" alt="Image de una plicacion" />

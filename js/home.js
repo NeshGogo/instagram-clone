@@ -45,8 +45,10 @@ firestore.collection(POSTS).orderBy('date', 'desc').get().then(async (snapshots)
     postList.innerHTML += `
       <div class="post-card">
         <div class="post-card--header">
-          <img id="postCartHeaderUserImg-${post.id}" alt="imagen del usuario del post">
-          <p id="postCartHeaderUserName-${post.id}"> </p>
+          <a href="./profile.html?id=${post.userRef}">
+            <img id="postCartHeaderUserImg-${post.id}" alt="imagen del usuario del post">
+            <p id="postCartHeaderUserName-${post.id}"> </p>
+          </a>
         </div>
         <img class="post-card--img" src="${post.imageUrl}" alt="Imagen del post">
         <div class="post-card--footer-img">

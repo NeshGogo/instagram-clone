@@ -26,8 +26,9 @@
   margin-bottom: 50px;
 }
 
-.post-card--header{
+.post-card--header > a{
   display: flex;
+  text-decoration: none;
   align-items: center;
   color:  #262626;;
   font-weight: bold;
