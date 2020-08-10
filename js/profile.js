@@ -115,8 +115,7 @@ const getPosts = (id) => {
 
 const appendPost = (post) => {
   postList.innerHTML += `
-    <div>
-      <div class=" post box ">
+      <div class="post">
         <a id="post-${post.id}">
           <img src="${post.imageUrl}" alt="Image de una plicacion" />
         </a>
@@ -125,7 +124,6 @@ const appendPost = (post) => {
           <a  id="postDelete-${post.id}"><img src="./assets/img/icon-delete.svg"></a>
         </div>
       </div>
-    </div>
   `;
 }
 
