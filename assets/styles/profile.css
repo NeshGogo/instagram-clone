@@ -101,8 +101,13 @@
   fill: rgb(59, 180, 255);
   border-radius: 50%;
 }
+.post__list{
+  display: flex;
+  flex-wrap: wrap;
+}
 .post{
   position: relative;
+  margin-right: 25px;
 }
 
 .post a img{
