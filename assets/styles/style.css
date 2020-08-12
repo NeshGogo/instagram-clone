@@ -278,26 +278,27 @@ body {
 }
 
 .modal-post__details--header {
-  height: 15%;
+  height: 8%;
   display: flex;
   border-bottom: 1px solid lightgray;
   justify-content: space-between;
 }
 
 .modal-post__details--header img {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   display: inline-block;
   border-radius: 50%;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 .modal-post__details--header div {
   display: flex;
   align-items: center;
 }
 .modal-post__details--description {
-  margin-top: 5px;
-  height: 15%;
+  margin-top: 10px;
+  height: auto;
+  font-size: 14px;
   padding-bottom: 10px;
 }
 .modal-post__details--description > p {
@@ -313,23 +314,29 @@ body {
   font-weight: lighter;
   font-style: italic;
   margin-top: 0;
+  margin-bottom: 5px;
 }
 
 .modal-post__details--description strong {
   font-weight: 500;
 }
 .modal-post__details--user-img {
-  width: 40px;
-  height: 40px;
-  margin-right: 20px;
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
   border-radius: 50%;
 }
 
 .modal-post__details--comments {
-  height: 51%;
+  max-height: 59%;
+  min-height: 46%;
   overflow-y: scroll;
   font-weight: lighter;
   font-style: italic;
+  font-size: 14px;
+}
+.modal-post__details--comments::-webkit-scrollbar{
+  display: none;
 }
 .modal-post__details--comments div {
   display: flex;
