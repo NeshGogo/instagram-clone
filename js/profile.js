@@ -249,11 +249,11 @@ const postEdit = (post) => {
   btnCreateAndEditPost.innerText = 'Actualizar';
   btnCreateAndEditPost.onclick = async () => {
     await firestore.collection(POSTS)
-      .doc(postId).update({ description: inputPostDescription.value });
+      .doc(post.id).update({ description: inputPostDescription.value });
     document.getElementById('close-addPost').onclick();
   }
   addPostTitle.innerText = 'Editar Publicacion';
-  showAddPost();
+  openModal('open-addPost');
 }
 
 const deletePost = async (post) => {

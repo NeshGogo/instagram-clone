@@ -7,28 +7,24 @@ const COMMENTS = 'comments';
 const errorLog = [];
 let currentUser = {};
 
-// HtmlElements del header.
-const headerUserImage = document.querySelector('#headerUserImage');
-const headerUserFullname = document.querySelector('#headerUserFullname');
+// HtmlElements de la pagina principal;
+const postList = document.querySelector('#homePosts');
 
 //HtmlElements del modal de open post
-const openPost = document.getElementById('open-post');
-const postImg = document.querySelector('#postImg');
-const postHeader = document.querySelector('#postHeader');
-const postDescription = document.querySelector('#postDescription');
+const postCommentAmount = document.querySelector('#postCommentAmount');
 const postCommentList = document.querySelector('#postCommentList');
 const modalPostLikes = document.querySelector('#modalPostLikes');
-const sentComment = document.querySelector('#sentComment');
 const modalPostLikeIcon = document.querySelector('#modalPostLikeIcon');
 
+// Verifica que haya un usuario legueado.
 auth.onAuthStateChanged(async (userAccount) => {
   if (userAccount) {
     currentUser = { id: userAccount.uid };
     firestore.collection(USERS).doc(userAccount.uid)
       .onSnapshot(function (userRef) {
         currentUser = { ...currentUser, ...userRef.data() }
-        headerUserFullname.innerText = currentUser.fullName;
-        headerUserImage.src = currentUser.imageUrl;
+        document.querySelector('#headerUserFullname').innerText = currentUser.fullName;
+        document.querySelector('#headerUserImage').src = currentUser.imageUrl;
       });
     onChangeSearcherInput();
   } else {
@@ -36,13 +32,50 @@ auth.onAuthStateChanged(async (userAccount) => {
   }
 });
 
-
+//Obtiene todos los post ordenados por fecha.
 firestore.collection(POSTS).orderBy('date', 'desc').get().then(async (snapshots) => {
-  const postList = document.querySelector('#homePosts');
   postList.innerHTML = '';
   snapshots.forEach(async (postRef) => {
     const post = { id: postRef.id, ...postRef.data() };
-    postList.innerHTML += `
+    appendPostCart(post)
+    initPostCart(post);
+  })
+})
+
+document.querySelector('#changePassword')
+  .onclick = () => openModal('open-changePassword');
+
+document.querySelector('#close-changePassword')
+  .onclick = () => closeModal('open-changePassword', 'formChangePassword');
+
+// Realiza la operacion del cambio de contraseña.
+document.querySelector('#btnChangePassword').onclick = () => {
+  const inputsId = [
+    'inputLastPassword',
+    'inputNewPassword',
+    'inputNewPasswordConfirm'
+  ];
+  const inputLastPassword = document.querySelector('#inputLastPassword');
+  const inputNewPassword = document.querySelector('#inputNewPassword');
+  const inputNewPasswordConfirm = document.querySelector('#inputNewPasswordConfirm');
+  validateInputsNotNull(inputsId);
+  validateCofirmPassword(inputNewPassword, inputNewPasswordConfirm);
+  if (errorLog.length > 0) {
+    showErrors();
+    return false;
+  }
+  changePassword(inputLastPassword.value, inputNewPassword.value);
+}
+
+document.getElementById('close-post').onclick = () =>  closeModal('open-post');
+
+document.querySelector('#signOut').onclick = () => {
+  auth.signOut();
+}
+
+// Agrega el post cart a la vista.
+const appendPostCart = (post) => {
+  postList.innerHTML += `
       <div class="post-card">
         <div class="post-card--header">
           <a href="./profile.html?id=${post.userRef}">
@@ -71,55 +104,13 @@ firestore.collection(POSTS).orderBy('date', 'desc').get().then(async (snapshots)
         </div>
       </div>
     `;
-    initPost(post);
-  })
-})
-
-document.querySelector('#changePassword')
-  .onclick = () => openModal('open-changePassword');
-
-document.querySelector('#close-changePassword')
-  .onclick = () => closeModal('open-changePassword', 'formChangePassword');
-
-document.querySelector('#btnChangePassword').onclick = () => {
-  const inputsId = [
-    'inputLastPassword',
-    'inputNewPassword',
-    'inputNewPasswordConfirm'
-  ];
-  const inputLastPassword = document.querySelector('#inputLastPassword');
-  const inputNewPassword = document.querySelector('#inputNewPassword');
-  const inputNewPasswordConfirm = document.querySelector('#inputNewPasswordConfirm');
-  validateInputsNotNull(inputsId);
-  validateCofirmPassword(inputNewPassword, inputNewPasswordConfirm);
-  if (errorLog.length > 0) {
-    showErrors();
-    return false;
-  }
-  changePassword(inputLastPassword.value, inputNewPassword.value);
 }
 
-document.getElementById('close-post').onclick = () => {
-  postImg.src = '';
-  postHeader.innerHTML = '';
-  postDescription.innerHTML = '';
-  postCommentList.innerHTML = '';
-  modalPostLikes.innerHTML = '';
-  modalPostLikeIcon.innerHTML = '';
-  // unsubscribe();
-  setTimeout(() => {
-    openPost.style.opacity = '0';
-    openPost.style.pointerEvents = 'none';
-  }, 0);
-}
-
-document.querySelector('#signOut').onclick = () => {
-  auth.signOut();
-}
-
-const initPost = async (post) => {
-  getLastTwoPostCommets(post.id);
-  const user = await getuserById(post.userRef);
+// Inicializa las funcionalidades del post cart
+const initPostCart = async (post) => {
+  getLastTwoPostCommetsByPost(post.id);
+  const user = (await firestore.collection(USERS)
+    .doc(post.userRef).get()).data();
   document.querySelector(`#postCartHeaderUserImg-${post.id}`).src = user.imageUrl;
   document.querySelector(`#postCartHeaderUserName-${post.id}`).innerText = user.userName;
   document.querySelector(`#postCartDescriptionUserName-${post.id}`).innerText = user.userName;
@@ -129,12 +120,13 @@ const initPost = async (post) => {
     const inputComment = document.querySelector(`#inputComment-${post.id}`);
     addPostComment(post.id, inputComment.value);
     inputComment.value = '';
-    getLastTwoPostCommets(post.id);
+    getLastTwoPostCommetsByPost(post.id);
   }
   ActiveOnChangePost(post.id, user)
 }
 
-const getLastTwoPostCommets = (postId) => {
+//Obtiene los dos ultimos comentarios por post.
+const getLastTwoPostCommetsByPost = (postId) => {
   firestore.collection(COMMENTS)
     .where('postRef', '==', postId)
     .orderBy('date', 'desc').limit(2)
@@ -152,12 +144,6 @@ const getLastTwoPostCommets = (postId) => {
     });
 }
 
-const getuserById = async (id) => {
-  const user = await firestore.collection(USERS)
-    .doc(id).get();
-  return user.data();
-}
-
 const addPostComment = async (postId, value) => {
   if (value !== '') {
     try {
@@ -171,6 +157,7 @@ const addPostComment = async (postId, value) => {
     }
   }
 }
+
 const addPostLike = async (postId) => {
   const docRef = firestore.collection(POSTS).doc(postId);
   const post = (await docRef.get()).data();
@@ -182,6 +169,8 @@ const addPostLike = async (postId) => {
       : fieldValue.arrayRemove(currentUser.id),
   })
 }
+
+// Observa los cambios de los post;
 const ActiveOnChangePost = (postId, user) => {
   firestore.collection(POSTS).doc(postId)
     .onSnapshot(snapShot => {
@@ -202,35 +191,15 @@ const ActiveOnChangePost = (postId, user) => {
     });
 }
 
+// Abre un modal con todo los datos del post;
 const showPost = (post, postUser) => {
-  const postCommentAmount = document.querySelector('#postCommentAmount');
   let liked = post.likesRef.includes(currentUser.id) ? true : false;
-  const likeIcon = liked ?
-    './assets/img/icon-heart-red.png'
-    : './assets/img/icon-heart-outline.png';
-  postImg.src = post.imageUrl;
-  postHeader.innerHTML = `
-    <img
-      class="modal-post__details--user-img"
-      src="${postUser.imageUrl}"
-      alt="Imagen del usuario">
-    <p><b>${postUser.userName}</b></p>
-  `;
-  postDescription.innerHTML = `
-    <img
-      class="modal-post__details--user-img"
-      src="${postUser.imageUrl}"
-      alt="Imagen del usuario">
-    <p><strong>${postUser.userName}</strong> ${post.description}</p>
-  `;
-  modalPostLikeIcon.innerHTML = `<img src="${likeIcon}" alt="icono de favorito">`;
-  postCommentAmount.innerHTML = post.commentsRef.length
-  modalPostLikes.innerText = post.likes;
-
+  showPostInit(post, postUser, liked)
   getPostComments(post.id);
-  sentComment.onclick = () => {
+  document.querySelector('#sentComment').onclick = () => {
     const input = document.querySelector('#ModalPostinputComment');
-    addPostComment(post.id, input.value)
+    addPostComment(post.id, input.value);
+    postCommentAmount.innerHTML = post.commentsRef.length + 1;
     input.value = '';
     getPostComments(post.id);
   };
@@ -244,12 +213,33 @@ const showPost = (post, postUser) => {
     modalPostLikes.innerText = post.likes;
     addPostLike(post.id);
   }
-  setTimeout(() => {
-    openPost.style.opacity = '1';
-    openPost.style.pointerEvents = 'auto';
-  }, 0);
+  openModal('open-post')
 }
 
+// Inicializa el modal del post;
+const showPostInit = (post, postUser, liked) => {
+  const likeIcon = liked ?
+    './assets/img/icon-heart-red.png'
+    : './assets/img/icon-heart-outline.png';
+  document.querySelector('#postImg').src = post.imageUrl;
+  document.querySelector('#postHeader').innerHTML = `
+    <img
+      class="modal-post__details--user-img"
+      src="${postUser.imageUrl}"
+      alt="Imagen del usuario">
+    <p><b>${postUser.userName}</b></p>
+  `;
+  document.querySelector('#postDescription').innerHTML = `
+    <img
+      class="modal-post__details--user-img"
+      src="${postUser.imageUrl}"
+      alt="Imagen del usuario">
+    <p><strong>${postUser.userName}</strong> ${post.description}</p>
+  `;
+  modalPostLikeIcon.innerHTML = `<img src="${likeIcon}" alt="icono de favorito">`;
+  postCommentAmount.innerHTML = post.commentsRef.length
+  modalPostLikes.innerText = post.likes;
+}
 
 const getPostComments = (postId) => {
   firestore.collection(COMMENTS)
@@ -298,6 +288,8 @@ const closeModal = (tagId, tagFormId = '') => {
     modal.style.pointerEvents = 'none';
   }, 0);
 }
+
+//Realiza el cambio de clave.
 const changePassword = (lastPassword, newPassword) => {
   const user = auth.currentUser;
   auth.signInWithEmailAndPassword(user.email, lastPassword)
@@ -319,6 +311,8 @@ const changePassword = (lastPassword, newPassword) => {
     })
     .catch(() => swal('Invalido!', 'La contraseña actual es incorrecta', 'error'));
 }
+
+// Verifica que un grupo de campos no esten nulos
 const validateInputsNotNull = (inputsId) => {
   inputsId.forEach(inputId => {
     const input = document.getElementById(inputId);
@@ -332,6 +326,7 @@ const validateInputsNotNull = (inputsId) => {
   });
 }
 
+// Verifica que las claves coincidan.
 const validateCofirmPassword = (inputNewPassword, inputConfirmPassword) => {
   if (inputNewPassword.value !== inputConfirmPassword.value) {
     const error = {
@@ -342,12 +337,14 @@ const validateCofirmPassword = (inputNewPassword, inputConfirmPassword) => {
   }
 }
 
+// Agrega un error al log de errores.
 const addError = (error) => {
   const verified = !errorLog
     .some((er) => er.message === error.message && er.id === error.id);
   if (verified) errorLog.push(error);
 }
 
+//Muestra los erroer que tiene el log en la vista.
 const showErrors = () => {
   errorLog.forEach(error =>
     document.getElementById(error.id).innerHTML = ''
@@ -361,9 +358,9 @@ const showErrors = () => {
   errorLog.length = 0;
 }
 
+// Busca por nombre de usuario que coincidan con el valor cada vez que el usuario introduce un valor.
 const onChangeSearcherInput = () => {
   const inputSearch = document.querySelector('#headerSearchInput');
-
   inputSearch.addEventListener('input', async (event) => {
     const value = event.target.value;
     if (value) {
@@ -382,6 +379,7 @@ const onChangeSearcherInput = () => {
   })
 }
 
+// busca los primeros 5 usuarios que inicien con el valor suministrado.
 const searchUserByUserNameCoincidences = async (value) => {
   const users = [];
   const userRefs = await firestore.collection(USERS).orderBy('userName')
@@ -392,6 +390,7 @@ const searchUserByUserNameCoincidences = async (value) => {
   return users;
 }
 
+// Agrega un listado de usuarios a la vista de resultados del buscador.
 const appendUserToSearchResult = (users) => {
   const results = document.querySelector('#searcherResults');
   results.innerHTML = '';
@@ -407,6 +406,8 @@ const appendUserToSearchResult = (users) => {
     `;
   })
 }
+
+// Vuelve a mostrar el valor por defecto del lista de resultados del buscador.
 const resetSearchResult = () => {
   const results = document.querySelector('#searcherResults');
   results.innerHTML = '<li>No hay resultados.</li>';

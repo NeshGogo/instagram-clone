@@ -37,8 +37,8 @@
 }
 
 .post-card--header img{
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   margin-left: 10px;
   margin-right: 5px;
   border-radius: 50%;
@@ -64,6 +64,7 @@
 }
 .post-card--description{
   margin: 0 10px;
+  font-size: 14px;
 }
 
 .post-card--description h4{
@@ -79,6 +80,7 @@
 }
 
 .post-card--comments{
+  font-size: 14px;
   margin: 0 10px;
 }
 .post-card--comments h4{
@@ -112,10 +114,13 @@
 .post-card--add-comment input{
   border-bottom: 1px solid lightgrey;
   color: black;
+  font-size: 14px;
+  font-style: italic;
   font-weight: 300;
 }
 .post-card--add-comment input::placeholder{
   font-weight: lighter;
+  font-size: 14px;
 }
 .post-card--add-comment a{
   cursor: pointer;
